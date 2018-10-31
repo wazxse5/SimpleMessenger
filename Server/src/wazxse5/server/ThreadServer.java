@@ -37,10 +37,7 @@ public class ThreadServer {
         Future<Client> result = executor.submit(authenticationTask);
         try {
             Client client = result.get();
-            if (client != null) {
-                sendFromServer(client, "loginok");
-                System.out.println("connected " + client.getName());
-            } else connection.close();
+            if (client == null) connection.close();
         } catch (InterruptedException | ExecutionException | IOException e) {
             e.printStackTrace();
         }
@@ -52,8 +49,8 @@ public class ThreadServer {
 
     public void loadClients(String path) {
         clients = new ArrayList<>();
-        clients.add(new Client("marek", "debil"));
-        clients.add(new Client("wazxse5", "dupa"));
+        clients.add(new Client("marek", "debil", false));
+        clients.add(new Client("wazxse5", "dupa", false));
     }
 
     public synchronized Client findClient(String name) {

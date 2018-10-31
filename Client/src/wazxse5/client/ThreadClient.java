@@ -25,7 +25,7 @@ public class ThreadClient {
         this.port = port;
     }
 
-    public boolean connect(String name, String password) throws IOException {
+    public boolean connect(String name, String password) throws IOException, InterruptedException, ExecutionException, TimeoutException {
         socket = new Socket(host, port);
         input = new Scanner(socket.getInputStream());
         output = new PrintWriter(socket.getOutputStream(), true);
@@ -33,14 +33,10 @@ public class ThreadClient {
         executor = Executors.newSingleThreadExecutor();
         LoginTask loginTask = new LoginTask(input);
         Future<Boolean> future = executor.submit(loginTask);
-        send("_serv_" + name + ";" + password);
+        if (password != null) send("_serv_login_" + name + ";" + password);
+        else send("_serv_guest_" + name);
 
-        try {
-            return future.get(5, TimeUnit.SECONDS);
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            return false;
-        }
-
+        return future.get(3, TimeUnit.SECONDS);
     }
 
     public void start() {

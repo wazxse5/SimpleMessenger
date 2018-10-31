@@ -3,13 +3,14 @@ package wazxse5.server;
 public class Client {
     private String name;
     private String password;
-
+    private boolean guest;
     private boolean connected;
     private Connection connection;
 
-    public Client(String name, String password) {
+    public Client(String name, String password, boolean guest) {
         this.name = name;
         this.password = password;
+        this.guest = guest;
     }
 
     public void send(String from, String message) {
@@ -38,5 +39,9 @@ public class Client {
 
     public void setConnection(Connection connection) {
         this.connection = connection;
+    }
+
+    public boolean isGuest() {
+        return guest;
     }
 }

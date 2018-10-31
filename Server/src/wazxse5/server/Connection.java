@@ -35,6 +35,10 @@ public class Connection extends Task {
         output.println(from + "_" + message);
     }
 
+    public void sendServer(String message) {
+        output.println("_serv_" + message);
+    }
+
     public void close() throws IOException {
         socket.close();
     }
