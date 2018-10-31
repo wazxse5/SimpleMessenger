@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="wazxse5.client.controller.LoginController">
    <children>
       <VBox layoutX="124.0" layoutY="91.0" prefHeight="200.0" prefWidth="100.0" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="100.0">
@@ -31,7 +27,7 @@
             <HBox prefHeight="100.0" prefWidth="200.0">
                <children>
                   <Label text="Port" />
-                  <TextField fx:id="serverPort" text="8999" />
+                   <TextField fx:id="serverPort" text="8989"/>
                </children>
             </HBox>
          </children>

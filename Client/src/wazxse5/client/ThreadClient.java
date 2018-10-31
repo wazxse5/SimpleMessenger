@@ -3,36 +3,49 @@ package wazxse5.client;
 import javafx.beans.property.ReadOnlyStringProperty;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.Scanner;
+import java.util.concurrent.*;
 
 public class ThreadClient {
     private String host;
     private int port;
-
     private Socket socket;
-    private ReceiveTask receiveTask;
+
+    private Scanner input;
     private PrintWriter output;
+
+    private ExecutorService executor;
+    private ReceiveTask receiveTask;
+
 
     public ThreadClient(String host, int port) {
         this.host = host;
         this.port = port;
     }
 
-    public void connect() throws IOException {
+    public boolean connect(String name, String password) throws IOException {
         socket = new Socket(host, port);
-        InputStream inputStream = socket.getInputStream();
-        receiveTask = new ReceiveTask(inputStream);
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(receiveTask);
-        executor.shutdown();
+        input = new Scanner(socket.getInputStream());
+        output = new PrintWriter(socket.getOutputStream(), true);
 
-        OutputStream outputStream = socket.getOutputStream();
-        output = new PrintWriter(outputStream, true);
+        executor = Executors.newSingleThreadExecutor();
+        LoginTask loginTask = new LoginTask(input);
+        Future<Boolean> future = executor.submit(loginTask);
+        send("_serv_" + name + ";" + password);
+
+        try {
+            return future.get(5, TimeUnit.SECONDS);
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            return false;
+        }
+
+    }
+
+    public void start() {
+        receiveTask = new ReceiveTask(input);
+        executor.execute(receiveTask);
     }
 
     public void send(String message) {

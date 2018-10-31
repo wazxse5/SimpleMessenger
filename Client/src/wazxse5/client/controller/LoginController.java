@@ -10,8 +10,6 @@ import javafx.stage.Stage;
 import wazxse5.client.ThreadClient;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class LoginController {
     private Stage primaryStage;
@@ -22,10 +20,14 @@ public class LoginController {
     @FXML private TextField serverPort;
 
     public void login() {
-
         ThreadClient threadClient = new ThreadClient(serverAddress.getText(), Integer.parseInt(serverPort.getText()));
         try {
-            threadClient.connect();
+            boolean connected = threadClient.connect(login.getText(), password.getText());
+            if (!connected) {
+                System.err.println("Nie połączono");
+                return;
+            }
+            threadClient.start();
         } catch (IOException e) {
             e.printStackTrace();
         }

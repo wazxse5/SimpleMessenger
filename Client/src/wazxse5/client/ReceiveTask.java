@@ -2,14 +2,13 @@ package wazxse5.client;
 
 import javafx.concurrent.Task;
 
-import java.io.InputStream;
 import java.util.Scanner;
 
 public class ReceiveTask extends Task {
     private Scanner input;
 
-    public ReceiveTask(InputStream inputStream) {
-        this.input = new Scanner(inputStream);
+    public ReceiveTask(Scanner input) {
+        this.input = input;
     }
 
     @Override protected Object call() throws Exception {
