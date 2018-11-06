@@ -16,6 +16,7 @@ public class ReceiveTask extends Task {
             if (input.hasNextLine()) {
                 updateMessage(input.nextLine());
             }
+            System.out.println("ReceiveTask.call");
         }
         return null;
     }

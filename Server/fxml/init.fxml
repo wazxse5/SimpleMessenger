@@ -1,17 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0"
             prefWidth="300.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="wazxse5.server.controller.InitController">
    <children>
-      <Label layoutX="107.0" layoutY="50.0" text="Uruchom serwer"/>
-      <Button layoutX="107.0" layoutY="188.0" mnemonicParsing="false" onAction="#startServer" text="Uruchom"/>
-      <TextField fx:id="portTF" layoutX="111.0" layoutY="260.0" prefWidth="80.0" text="8989"/>
-      <Label layoutX="83.0" layoutY="264.0" text="Port"/>
+       <Label layoutX="63.0" layoutY="50.0" text="Uruchom serwer" AnchorPane.topAnchor="50.0">
+           <font>
+               <Font size="24.0"/>
+           </font>
+       </Label>
+       <Button fx:id="startServerButton" layoutX="100.0" layoutY="185.0" mnemonicParsing="false" onAction="#startServer"
+               prefHeight="30.0" prefWidth="100.0" text="Uruchom" AnchorPane.bottomAnchor="185.0"/>
+       <HBox alignment="CENTER" layoutX="75.0" layoutY="188.0" prefWidth="150.0" spacing="10.0"
+             AnchorPane.bottomAnchor="100.0">
+           <children>
+               <Label text="Port"/>
+               <TextField fx:id="portTF" prefWidth="80.0" text="8989"/>
+           </children>
+       </HBox>
+       <Label fx:id="infoLabel" layoutX="14.0" layoutY="369.0" AnchorPane.bottomAnchor="30.0"
+              AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0"/>
    </children>
 </AnchorPane>

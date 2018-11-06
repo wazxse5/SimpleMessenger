@@ -1,62 +1,66 @@
 package wazxse5.server;
 
+import wazxse5.server.tasks.AcceptingTask;
+import wazxse5.server.tasks.UpdatingConnectedClientsTask;
+
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class ThreadServer {
     private int port;
-    private ExecutorService executor = Executors.newCachedThreadPool();
-    private List<Client> clients;
+
+    private ExecutorService executor;
+    private Future acceptingTaskFuture;
+    private AcceptingTask acceptingTask;
+    private Future updatingConnectedClientsFuture;
+
+    private ClientsLoader clientsLoader;
+    private List<Client> connectedClients;
 
     public ThreadServer(int port) {
         this.port = port;
-        loadClients("aa");
+
+        executor = Executors.newCachedThreadPool();
+
+        clientsLoader = new ClientsLoader();
+        connectedClients = new ArrayList<>();
     }
 
     public void start() {
         try {
             ServerSocket serverSocket = new ServerSocket(port);
-            AcceptingTask acceptingTask = new AcceptingTask(serverSocket);
-            acceptingTask.valueProperty().addListener((observable, oldValue, newValue) -> checkNewConnection(newValue));
-            executor.execute(acceptingTask);
+
+            acceptingTask = new AcceptingTask(serverSocket, clientsLoader);
+            acceptingTask.valueProperty().addListener((observable, oldValue, newValue) -> addNewConnectedClient(newValue));
+            acceptingTaskFuture = executor.submit(acceptingTask);
+
+            UpdatingConnectedClientsTask updatingConnectedClientsTask = new UpdatingConnectedClientsTask(this);
+            updatingConnectedClientsFuture = executor.submit(updatingConnectedClientsTask);
+
+
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void checkNewConnection(Socket socket) {
-        Connection connection = new Connection(socket);
-        AuthenticationTask authenticationTask = new AuthenticationTask(this, connection);
-        Future<Client> result = executor.submit(authenticationTask);
-        try {
-            Client client = result.get();
-            if (client == null) connection.close();
-        } catch (InterruptedException | ExecutionException | IOException e) {
-            e.printStackTrace();
-        }
+    private void addNewConnectedClient(Client client) {
+        connectedClients.add(client);
     }
 
-    public void sendFromServer(Client c, String message) {
-        c.getConnection().getOutput().println("_serv_loginok");
+    public List<Client> getConnectedClients() {
+        return connectedClients;
     }
 
-    public void loadClients(String path) {
-        clients = new ArrayList<>();
-        clients.add(new Client("marek", "debil", false));
-        clients.add(new Client("wazxse5", "dupa", false));
-    }
+    public void close() {
+        executor.shutdown();
+        updatingConnectedClientsFuture.cancel(true);
 
-    public synchronized Client findClient(String name) {
-        for (Client client : clients) {
-            if (client.getName().equals(name)) return client;
-        }
-        return null;
+        acceptingTaskFuture.cancel(true);
+        acceptingTask.cancel(true);
     }
 }

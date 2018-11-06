@@ -48,14 +48,14 @@ public class ThreadClient {
         output.println(message);
     }
 
-    public void disconnect() {
-        output.println("na razie");
-        receiveTask.cancel();
+    public void close() {
         try {
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        receiveTask.cancel(true);
+        executor.shutdown();
     }
 
     public ReadOnlyStringProperty receiveProperty() {

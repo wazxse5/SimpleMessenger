@@ -14,7 +14,7 @@ public class Client {
     }
 
     public void send(String from, String message) {
-
+        connection.send(from, message);
     }
 
     public String getName() {

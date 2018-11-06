@@ -26,7 +26,7 @@ public class MainController {
 
     public void setThreadClient(ThreadClient threadClient) {
         this.threadClient = threadClient;
-        primaryStage.setOnCloseRequest(event -> threadClient.disconnect());
+        primaryStage.setOnCloseRequest(event -> threadClient.close());
         outputTA.textProperty().bind(threadClient.receiveProperty());
     }
 }

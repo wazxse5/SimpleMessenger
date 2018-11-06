@@ -28,7 +28,6 @@ public class LoginController {
         try {
             String serverAddress = serverAddressTF.getText();
             int serverPort = Integer.parseInt(serverPortTF.getText());
-
             try {
                 ThreadClient threadClient = new ThreadClient(serverAddress, serverPort);
                 String login = loginTF.getText();
@@ -37,22 +36,8 @@ public class LoginController {
                 boolean connected = threadClient.connect(login, password);
                 if (connected) {
                     threadClient.start();
-
-                    try {
-                        FXMLLoader loader = new FXMLLoader(getClass().getResource("/main.fxml"));
-                        Parent parent = loader.load();
-                        MainController mainController = loader.getController();
-                        mainController.setPrimaryStage(primaryStage);
-
-                        mainController.setThreadClient(threadClient);
-
-                        Scene scene = new Scene(parent);
-                        primaryStage.setScene(scene);
-                    } catch (IOException e) {
-                        infoLabel.setText("Nie można wczytać widoku okna");
-                    }
+                    loadMainScreen(threadClient);
                 }
-
             } catch (ExecutionException e) {
                 Throwable cause = e.getCause();
                 if (cause instanceof ConnectionException) {
@@ -65,6 +50,23 @@ public class LoginController {
 
         } catch (NumberFormatException exception) {
             infoLabel.setText("Niepoprawny port");
+        }
+    }
+
+    private void loadMainScreen(ThreadClient threadClient) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/main.fxml"));
+            Parent parent = loader.load();
+            MainController mainController = loader.getController();
+            mainController.setPrimaryStage(primaryStage);
+            mainController.setThreadClient(threadClient);
+
+            Scene scene = new Scene(parent);
+            primaryStage.setScene(scene);
+            primaryStage.setResizable(true);
+            primaryStage.setOnCloseRequest(event -> threadClient.close());
+        } catch (IOException e) {
+            infoLabel.setText("Nie można wczytać widoku okna");
         }
     }
 
