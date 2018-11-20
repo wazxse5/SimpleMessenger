@@ -1,11 +1,12 @@
-package wazxse5.server.message.config;
+package message.config;
 
-import wazxse5.server.message.ServerMessage;
+import message.ServerMessage;
 
 public class LoginRequestMessage extends ServerMessage {
-    private String name;
-    private String password;
-    private boolean guest;
+    private static final long serialVersionUID = -8511670995169064933L;
+    private final String name;
+    private final String password;
+    private final boolean guest;
 
     public LoginRequestMessage(String name, String password) {
         this.name = name;

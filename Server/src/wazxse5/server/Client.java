@@ -1,5 +1,9 @@
 package wazxse5.server;
 
+import message.Message;
+
+import java.io.IOException;
+
 public class Client {
     private String name;
     private String password;
@@ -13,8 +17,12 @@ public class Client {
         this.guest = guest;
     }
 
-    public void send(String from, String message) {
-        connection.send(from, message);
+    public void send(Message message) {
+        try {
+            connection.send(message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public String getName() {

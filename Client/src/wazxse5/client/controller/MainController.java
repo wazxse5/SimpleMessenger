@@ -15,7 +15,7 @@ public class MainController {
 
 
     public void sendMessage() {
-        threadClient.send(inputTF.getText());
+        threadClient.send("client", inputTF.getText());
         inputTF.setText("");
     }
 

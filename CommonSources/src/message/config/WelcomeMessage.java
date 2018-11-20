@@ -1,9 +1,10 @@
-package wazxse5.server.message.config;
+package message.config;
 
-import wazxse5.server.message.ServerMessage;
+import message.ServerMessage;
 
 public class WelcomeMessage extends ServerMessage {
-    private String greeting;
+    private static final long serialVersionUID = 7594607177957975646L;
+    private final String greeting;
 
     public WelcomeMessage(String greeting) {
         this.greeting = greeting;

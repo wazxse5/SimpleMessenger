@@ -1,4 +1,4 @@
-package wazxse5.server.tasks;
+package wazxse5.server.task;
 
 import javafx.concurrent.Task;
 import wazxse5.server.Client;
@@ -16,11 +16,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class AcceptingTask extends Task<Client> {
-    private ServerSocket serverSocket;
-    private ClientsLoader clientsLoader;
-    private ExecutorService executor;
+    private final ServerSocket serverSocket;
+    private final ClientsLoader clientsLoader;
+    private final ExecutorService executor;
 
-    private Map<Future<Client>, Connection> authenticationTasks;
+    private final Map<Future<Client>, Connection> authenticationTasks;
 
 
     public AcceptingTask(ServerSocket serverSocket, ClientsLoader clientsLoader) {

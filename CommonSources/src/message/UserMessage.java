@@ -1,9 +1,10 @@
-package wazxse5.server.message;
+package message;
 
 public class UserMessage extends Message {
-    private String from;
-    private String to;
-    private String message;
+    private static final long serialVersionUID = 6629966587887294896L;
+    private final String from;
+    private final String to;
+    private final String message;
 
     public UserMessage(String from, String to, String message) {
         this.from = from;

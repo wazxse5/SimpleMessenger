@@ -1,9 +1,10 @@
-package wazxse5.server.message.config;
+package message.config;
 
-import wazxse5.server.message.ServerMessage;
+import message.ServerMessage;
 
 public class SessionAnswerMessage extends ServerMessage {
-    private int idSession;
+    private static final long serialVersionUID = 3465662164063416415L;
+    private final int idSession;
 
     public SessionAnswerMessage(int idSession) {
         this.idSession = idSession;

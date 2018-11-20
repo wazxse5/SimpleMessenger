@@ -1,20 +1,24 @@
 package wazxse5.client;
 
 import javafx.beans.property.ReadOnlyStringProperty;
+import message.UserMessage;
+import wazxse5.client.task.LoginTask;
+import wazxse5.client.task.ReceiveTask;
 
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.Scanner;
 import java.util.concurrent.*;
 
 public class ThreadClient {
-    private String host;
-    private int port;
+    private final String host;
+    private final int port;
     private Socket socket;
+    private ObjectInputStream input;
+    private ObjectOutputStream output;
 
-    private Scanner input;
-    private PrintWriter output;
+    private String userName;
 
     private ExecutorService executor;
     private ReceiveTask receiveTask;
@@ -25,18 +29,18 @@ public class ThreadClient {
         this.port = port;
     }
 
-    public boolean connect(String name, String password) throws IOException, InterruptedException, ExecutionException, TimeoutException {
+    public boolean connect(String name, String password, boolean asGuest) throws IOException, InterruptedException, ExecutionException, TimeoutException {
         socket = new Socket(host, port);
-        input = new Scanner(socket.getInputStream());
-        output = new PrintWriter(socket.getOutputStream(), true);
+        output = new ObjectOutputStream(socket.getOutputStream());
+        input = new ObjectInputStream(socket.getInputStream());
 
         executor = Executors.newSingleThreadExecutor();
-        LoginTask loginTask = new LoginTask(input);
+        LoginTask loginTask = new LoginTask(input, output, name, password, asGuest);
         Future<Boolean> future = executor.submit(loginTask);
-        if (password != null) send("_serv_login_" + name + ";" + password);
-        else send("_serv_guest_" + name);
 
-        return future.get(3, TimeUnit.SECONDS);
+        boolean connectionResult = future.get(3, TimeUnit.SECONDS);
+        if (connectionResult) userName = name;
+        return connectionResult;
     }
 
     public void start() {
@@ -44,8 +48,12 @@ public class ThreadClient {
         executor.execute(receiveTask);
     }
 
-    public void send(String message) {
-        output.println(message);
+    public void send(String to, String message) {
+        try {
+            output.writeObject(new UserMessage(userName, to, message));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void close() {

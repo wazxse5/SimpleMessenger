@@ -1,7 +1,7 @@
 package wazxse5.server;
 
-import wazxse5.server.tasks.AcceptingTask;
-import wazxse5.server.tasks.UpdatingConnectedClientsTask;
+import wazxse5.server.task.AcceptingTask;
+import wazxse5.server.task.UpdatingConnectedClientsTask;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -12,15 +12,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class ThreadServer {
-    private int port;
+    private final int port;
 
-    private ExecutorService executor;
+    private final ExecutorService executor;
     private Future acceptingTaskFuture;
     private AcceptingTask acceptingTask;
     private Future updatingConnectedClientsFuture;
 
-    private ClientsLoader clientsLoader;
-    private List<Client> connectedClients;
+    private final ClientsLoader clientsLoader;
+    private final List<Client> connectedClients;
 
     public ThreadServer(int port) {
         this.port = port;

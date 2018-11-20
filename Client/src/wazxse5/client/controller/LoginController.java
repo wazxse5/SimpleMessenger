@@ -1,5 +1,8 @@
 package wazxse5.client.controller;
 
+import exception.NameIsInUseException;
+import exception.NoSuchUserException;
+import exception.WrongPasswordException;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -9,7 +12,6 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import wazxse5.client.ThreadClient;
-import wazxse5.client.exception.ConnectionException;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
@@ -29,21 +31,23 @@ public class LoginController {
             String serverAddress = serverAddressTF.getText();
             int serverPort = Integer.parseInt(serverPortTF.getText());
             try {
-                ThreadClient threadClient = new ThreadClient(serverAddress, serverPort);
                 String login = loginTF.getText();
                 String password = passwordTF.getText();
-                if (guest) password = null;
-                boolean connected = threadClient.connect(login, password);
+
+                ThreadClient threadClient = new ThreadClient(serverAddress, serverPort);
+                boolean connected = threadClient.connect(login, password, guest);
                 if (connected) {
                     threadClient.start();
                     loadMainScreen(threadClient);
                 }
             } catch (ExecutionException e) {
-                Throwable cause = e.getCause();
-                if (cause instanceof ConnectionException) {
-                    ConnectionException connectionException = (ConnectionException) cause;
-                    infoLabel.setText(connectionException.getInfo());
-                } else infoLabel.setText("Nie można nawiązać połączenia");
+                if (e.getCause() instanceof NameIsInUseException)
+                    infoLabel.setText("Nazwa użytkownika jest w użyciu");
+                else if (e.getCause() instanceof NoSuchUserException)
+                    infoLabel.setText("Nie ma takiego użytkownika");
+                else if (e.getCause() instanceof WrongPasswordException)
+                    infoLabel.setText("Nieprawidłowe hasło");
+                else infoLabel.setText("Nie można nawiązać połączenia");
             } catch (IOException | InterruptedException | TimeoutException e) {
                 infoLabel.setText("Nie można nawiązać połączenia");
             }

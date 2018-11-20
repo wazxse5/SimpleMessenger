@@ -1,8 +1,10 @@
-package wazxse5.server.tasks;
+package wazxse5.server.task;
 
+import message.config.SessionMessage;
 import wazxse5.server.Client;
 import wazxse5.server.ThreadServer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class UpdatingConnectedClientsTask implements Runnable {
@@ -15,10 +17,13 @@ public class UpdatingConnectedClientsTask implements Runnable {
     @Override public void run() {
         while (!Thread.interrupted()) {
             List<Client> connectedClients = threadServer.getConnectedClients();
+            List<String> connectedClientsNames = new ArrayList<>();
+            for (Client c : connectedClients) connectedClientsNames.add(c.getName());
+
             for (int i = 0; i < connectedClients.size(); i++) {
                 for (int j = 0; j < connectedClients.size(); j++) {
                     if (i != j) {
-                        connectedClients.get(i).send("_serv", "connected_" + connectedClients.get(j).getName());
+                        connectedClients.get(i).send(new SessionMessage(1, connectedClientsNames));
                     }
                 }
             }
@@ -29,4 +34,5 @@ public class UpdatingConnectedClientsTask implements Runnable {
             }
         }
     }
+
 }

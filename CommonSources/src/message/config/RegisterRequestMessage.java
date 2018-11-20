@@ -1,11 +1,12 @@
-package wazxse5.server.message.config;
+package message.config;
 
-import wazxse5.server.message.ServerMessage;
+import message.ServerMessage;
 
 public class RegisterRequestMessage extends ServerMessage {
-    private String name;
-    private String password;
-    private String mail;
+    private static final long serialVersionUID = -7066000756945334003L;
+    private final String name;
+    private final String password;
+    private final String mail;
 
     public RegisterRequestMessage(String name, String password, String mail) {
         this.name = name;
