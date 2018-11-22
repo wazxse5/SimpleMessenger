@@ -24,6 +24,5 @@ public class Main extends Application {
 
         LoginController loginController = loader.getController();
         loginController.setPrimaryStage(primaryStage);
-
     }
 }

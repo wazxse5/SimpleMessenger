@@ -71,6 +71,7 @@ public class LoginController {
             primaryStage.setOnCloseRequest(event -> threadClient.close());
         } catch (IOException e) {
             infoLabel.setText("Nie można wczytać widoku okna");
+            e.printStackTrace();
         }
     }
 

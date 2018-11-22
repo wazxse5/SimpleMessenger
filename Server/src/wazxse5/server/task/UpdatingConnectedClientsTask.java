@@ -20,15 +20,11 @@ public class UpdatingConnectedClientsTask implements Runnable {
             List<String> connectedClientsNames = new ArrayList<>();
             for (Client c : connectedClients) connectedClientsNames.add(c.getName());
 
-            for (int i = 0; i < connectedClients.size(); i++) {
-                for (int j = 0; j < connectedClients.size(); j++) {
-                    if (i != j) {
-                        connectedClients.get(i).send(new SessionMessage(1, connectedClientsNames));
-                    }
-                }
+            for (Client connectedClient : connectedClients) {
+                connectedClient.send(new SessionMessage(1, connectedClientsNames));
             }
             try {
-                Thread.sleep(2000);
+                Thread.sleep(5000);
             } catch (InterruptedException e) {
                 break;
             }

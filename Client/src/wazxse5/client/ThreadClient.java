@@ -1,7 +1,13 @@
 package wazxse5.client;
 
-import javafx.beans.property.ReadOnlyStringProperty;
+import javafx.application.Platform;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleListProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import message.Message;
 import message.UserMessage;
+import message.config.SessionMessage;
 import wazxse5.client.task.LoginTask;
 import wazxse5.client.task.ReceiveTask;
 
@@ -9,6 +15,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.*;
 
 public class ThreadClient {
@@ -19,6 +27,8 @@ public class ThreadClient {
     private ObjectOutputStream output;
 
     private String userName;
+    private ListProperty<String> connectedFriendsProperty = new SimpleListProperty<>();
+    private ObservableList<String> connectedFriendsList = FXCollections.observableList(new ArrayList<>());
 
     private ExecutorService executor;
     private ReceiveTask receiveTask;
@@ -27,6 +37,7 @@ public class ThreadClient {
     public ThreadClient(String host, int port) {
         this.host = host;
         this.port = port;
+        connectedFriendsProperty.setValue(connectedFriendsList);
     }
 
     public boolean connect(String name, String password, boolean asGuest) throws IOException, InterruptedException, ExecutionException, TimeoutException {
@@ -38,13 +49,19 @@ public class ThreadClient {
         LoginTask loginTask = new LoginTask(input, output, name, password, asGuest);
         Future<Boolean> future = executor.submit(loginTask);
 
-        boolean connectionResult = future.get(3, TimeUnit.SECONDS);
-        if (connectionResult) userName = name;
-        return connectionResult;
+        try {
+            boolean connectionResult = future.get(3, TimeUnit.SECONDS);
+            if (connectionResult) userName = name;
+            return connectionResult;
+        } catch (TimeoutException timeoutException) {
+            future.cancel(true);
+            throw timeoutException;
+        }
     }
 
     public void start() {
         receiveTask = new ReceiveTask(input);
+        receiveTask.valueProperty().addListener((observable, oldValue, newValue) -> handleReceivedMessage(newValue));
         executor.execute(receiveTask);
     }
 
@@ -56,6 +73,31 @@ public class ThreadClient {
         }
     }
 
+    private void handleReceivedMessage(Message message) {
+        if (message instanceof UserMessage) {
+            UserMessage userMessage = (UserMessage) message;
+            System.out.print("from " + userMessage.getFrom() + ": ");
+            System.out.print(userMessage.getMessage());
+            System.out.println();
+        }
+        if (message instanceof SessionMessage) {
+            SessionMessage sessionMessage = (SessionMessage) message;
+            updateConnectedFriends(sessionMessage.getConncectedClientsNames());
+        }
+    }
+
+    private void updateConnectedFriends(List<String> currentlyConnectedFriends) {
+        Platform.runLater(() -> {
+            for (String friend : currentlyConnectedFriends) {
+                if (!connectedFriendsList.contains(friend)) connectedFriendsList.add(friend);
+            }
+        });
+    }
+
+    public ListProperty<String> connectedFriendsProperty() {
+        return connectedFriendsProperty;
+    }
+
     public void close() {
         try {
             socket.close();
@@ -64,10 +106,6 @@ public class ThreadClient {
         }
         receiveTask.cancel(true);
         executor.shutdown();
-    }
-
-    public ReadOnlyStringProperty receiveProperty() {
-        return receiveTask.messageProperty();
     }
 
 }

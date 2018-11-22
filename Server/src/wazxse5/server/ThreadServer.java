@@ -1,6 +1,7 @@
 package wazxse5.server;
 
 import wazxse5.server.task.AcceptingTask;
+import wazxse5.server.task.ReceiveTask;
 import wazxse5.server.task.UpdatingConnectedClientsTask;
 
 import java.io.IOException;
@@ -50,6 +51,9 @@ public class ThreadServer {
 
     private void addNewConnectedClient(Client client) {
         connectedClients.add(client);
+        ReceiveTask receiveTask = new ReceiveTask(client.getConnection().getInputStream());
+        receiveTask.valueProperty().addListener((observable, oldValue, newValue) -> client.handleReceivedMessage(newValue));
+        executor.submit(receiveTask);
     }
 
     public List<Client> getConnectedClients() {

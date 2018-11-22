@@ -1,16 +1,19 @@
 package wazxse5.server.task;
 
 import exception.AuthenticationException;
-import message.config.*;
+import javafx.concurrent.Task;
+import message.config.LoginAnswerMessage;
+import message.config.LoginRequestMessage;
+import message.config.RegisterAnswerMessage;
+import message.config.RegisterRequestMessage;
 import wazxse5.server.Client;
 import wazxse5.server.ClientsLoader;
 import wazxse5.server.Connection;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.concurrent.Callable;
 
-public class AuthenticationTask implements Callable<Client> {
+public class AuthenticationTask extends Task<Client> {
     private final Connection connection;
     private final ClientsLoader clientsLoader;
 
@@ -19,31 +22,22 @@ public class AuthenticationTask implements Callable<Client> {
         this.clientsLoader = clientsLoader;
     }
 
-    @Override public Client call() {
+
+    @Override protected Client call() {
         Client client = null;
         try {
             ObjectInputStream input = connection.getInputStream();
-            Object welcomeObject = input.readObject();
-            if (isGreetingOK(welcomeObject)) {
-                Object authenticationObject = input.readObject();
-                if (authenticationObject instanceof LoginRequestMessage) {
-                    client = login(authenticationObject);
-                } else if (authenticationObject instanceof RegisterRequestMessage) {
-                    client = register(authenticationObject);
-                }
+
+            Object authenticationObject = input.readObject();
+            if (authenticationObject instanceof LoginRequestMessage) {
+                client = login(authenticationObject);
+            } else if (authenticationObject instanceof RegisterRequestMessage) {
+                client = register(authenticationObject);
             }
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
         return client;
-    }
-
-    private boolean isGreetingOK(Object welcomeObject) {
-        if (welcomeObject instanceof WelcomeMessage) {
-            WelcomeMessage welcome = (WelcomeMessage) welcomeObject;
-            return welcome.getGreeting().equals("greeting");
-        }
-        return false;
     }
 
     private Client login(Object authenticationObject) throws IOException {
@@ -54,6 +48,8 @@ public class AuthenticationTask implements Callable<Client> {
         try {
             Client client = clientsLoader.login(name, password, isGuest);
             connection.send(new LoginAnswerMessage(true));
+            client.setConnected(true);
+            client.setConnection(connection);
             return client;
         } catch (AuthenticationException e) {
             connection.send(new LoginAnswerMessage(false, e.getCode()));

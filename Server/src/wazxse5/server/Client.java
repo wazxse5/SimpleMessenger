@@ -1,20 +1,33 @@
 package wazxse5.server;
 
 import message.Message;
+import message.UserMessage;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Client {
     private String name;
-    private String password;
     private boolean guest;
+
     private boolean connected;
     private Connection connection;
 
-    public Client(String name, String password, boolean guest) {
+    private List<Client> friends;
+
+    private ExecutorService executor = Executors.newSingleThreadExecutor();
+
+    public Client(String name, boolean guest, List<Client> friends) {
         this.name = name;
-        this.password = password;
         this.guest = guest;
+        this.friends = friends;
+    }
+
+    public Client(String name, boolean guest) {
+        this(name, guest, new ArrayList<>());
     }
 
     public void send(Message message) {
@@ -25,12 +38,20 @@ public class Client {
         }
     }
 
-    public String getName() {
-        return name;
+    public void handleReceivedMessage(Message message) {
+        if (message instanceof UserMessage) {
+            UserMessage userMessage = (UserMessage) message;
+            for (Client friend : friends) {
+                if (friend.getName().equals(userMessage.getTo())) {
+                    friend.send(message);
+                }
+            }
+
+        }
     }
 
-    public boolean checkPassword(String password) {
-        return this.password.equals(password);
+    public String getName() {
+        return name;
     }
 
     public boolean isConnected() {

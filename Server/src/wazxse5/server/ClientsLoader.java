@@ -17,8 +17,8 @@ public class ClientsLoader {
     }
 
     public void load() {
-        clients.add(new Client("test", "test1", false));
-        clients.add(new Client("wazxse5", "1234", false));
+        clients.add(new Client("test", false));
+        clients.add(new Client("wazxse5", false));
     }
 
     public synchronized Client register(String name, String password) throws AuthenticationException {
@@ -27,7 +27,7 @@ public class ClientsLoader {
                 throw new NameIsInUseException();
             }
         }
-        Client client = new Client(name, password, false);
+        Client client = new Client(name, false);
         clients.add(client);
         return client;
     }
@@ -39,13 +39,13 @@ public class ClientsLoader {
         return client;
     }
 
-    private Client loginAsGuest(String name) throws NameIsInUseException {
+    private synchronized Client loginAsGuest(String name) throws NameIsInUseException {
         for (Client c : clients) {
             if (c.getName().equals(name)) {
                 throw new NameIsInUseException();
             }
         }
-        Client client = new Client(name, null, true);
+        Client client = new Client(name, true);
         clients.add(client);
         return client;
     }
@@ -54,11 +54,20 @@ public class ClientsLoader {
         for (Client c : clients) {
             if (c.getName().equals(name)) {
                 // TODO: Dodać sprawdzanie czy klient nie został już zaologowany
-                if (c.checkPassword(password)) {
+                if (checkPassword(c, password)) {
                     return c;
                 } else throw new WrongPasswordException();
             }
         }
         throw new NoSuchUserException();
     }
+
+    private boolean checkPassword(Client client, String password) {
+        // TODO: sprawdzanie hasła z pliku
+        if (client.getName().equals("wazxse5") && password.equals("1234")) return true;
+        else if (client.getName().equals("test") && password.equals("0000")) return true;
+        else return false;
+    }
+
+
 }

@@ -5,7 +5,6 @@ import exception.NoSuchUserException;
 import exception.WrongPasswordException;
 import message.config.LoginAnswerMessage;
 import message.config.LoginRequestMessage;
-import message.config.WelcomeMessage;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -28,16 +27,12 @@ public class LoginTask implements Callable<Boolean> {
     }
 
     @Override public Boolean call() throws Exception {
-        output.writeObject(new WelcomeMessage("greeting"));
-
         if (asGuest) output.writeObject(new LoginRequestMessage(name));
         else output.writeObject(new LoginRequestMessage(name, password));
 
         while (true) {
-            System.out.println("LoginTask.call.while");
             Object answerObject = input.readObject();
             if (answerObject instanceof LoginAnswerMessage) {
-                System.out.println("LoginTask.call.readAnswer");
                 LoginAnswerMessage loginAnswer = (LoginAnswerMessage) answerObject;
                 if (loginAnswer.isGood()) return true;
                 else {
