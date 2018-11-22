@@ -1,5 +1,9 @@
 package wazxse5.server;
 
+import message.Message;
+import message.ServerMessage;
+import message.UserMessage;
+import message.config.GoodbyeMessage;
 import wazxse5.server.task.AcceptingTask;
 import wazxse5.server.task.ReceiveTask;
 import wazxse5.server.task.UpdatingConnectedClientsTask;
@@ -52,8 +56,25 @@ public class ThreadServer {
     private void addNewConnectedClient(Client client) {
         connectedClients.add(client);
         ReceiveTask receiveTask = new ReceiveTask(client.getConnection().getInputStream());
-        receiveTask.valueProperty().addListener((observable, oldValue, newValue) -> client.handleReceivedMessage(newValue));
+        receiveTask.valueProperty().addListener((observable, oldValue, newValue) -> handleReceivedMessage(client, newValue));
         executor.submit(receiveTask);
+    }
+
+    private void handleReceivedMessage(Client client, Message message) {
+        if (message instanceof UserMessage) {
+            UserMessage userMessage = (UserMessage) message;
+            client.handleReceivedMessage(userMessage);
+        } else if (message instanceof ServerMessage) {
+            if (message instanceof GoodbyeMessage) {
+                client.setConnected(false);
+                connectedClients.remove(client);
+                try {
+                    client.getConnection().close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     public List<Client> getConnectedClients() {

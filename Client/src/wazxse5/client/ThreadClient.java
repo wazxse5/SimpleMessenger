@@ -7,7 +7,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import message.Message;
 import message.UserMessage;
+import message.config.GoodbyeMessage;
 import message.config.SessionMessage;
+import wazxse5.client.controller.MainController;
 import wazxse5.client.task.LoginTask;
 import wazxse5.client.task.ReceiveTask;
 
@@ -29,6 +31,7 @@ public class ThreadClient {
     private String userName;
     private ListProperty<String> connectedFriendsProperty = new SimpleListProperty<>();
     private ObservableList<String> connectedFriendsList = FXCollections.observableList(new ArrayList<>());
+    private MainController mainController;
 
     private ExecutorService executor;
     private ReceiveTask receiveTask;
@@ -76,9 +79,7 @@ public class ThreadClient {
     private void handleReceivedMessage(Message message) {
         if (message instanceof UserMessage) {
             UserMessage userMessage = (UserMessage) message;
-            System.out.print("from " + userMessage.getFrom() + ": ");
-            System.out.print(userMessage.getMessage());
-            System.out.println();
+            mainController.handleReceivedMessage(userMessage.getFrom(), userMessage.getMessage());
         }
         if (message instanceof SessionMessage) {
             SessionMessage sessionMessage = (SessionMessage) message;
@@ -91,6 +92,9 @@ public class ThreadClient {
             for (String friend : currentlyConnectedFriends) {
                 if (!connectedFriendsList.contains(friend)) connectedFriendsList.add(friend);
             }
+            for (String friend : connectedFriendsList) {
+                if (!currentlyConnectedFriends.contains(friend)) connectedFriendsList.remove(friend);
+            }
         });
     }
 
@@ -98,8 +102,13 @@ public class ThreadClient {
         return connectedFriendsProperty;
     }
 
+    public void setMainController(MainController mainController) {
+        this.mainController = mainController;
+    }
+
     public void close() {
         try {
+            output.writeObject(new GoodbyeMessage());
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();

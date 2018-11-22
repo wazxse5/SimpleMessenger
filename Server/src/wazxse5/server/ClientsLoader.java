@@ -19,6 +19,8 @@ public class ClientsLoader {
     public void load() {
         clients.add(new Client("test", false));
         clients.add(new Client("wazxse5", false));
+
+        for (Client client : clients) for (Client friend : clients) if (client != friend) client.addFriend(friend);
     }
 
     public synchronized Client register(String name, String password) throws AuthenticationException {
@@ -45,7 +47,7 @@ public class ClientsLoader {
                 throw new NameIsInUseException();
             }
         }
-        Client client = new Client(name, true);
+        Client client = new Client(name, true, clients);
         clients.add(client);
         return client;
     }

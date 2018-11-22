@@ -38,16 +38,17 @@ public class Client {
         }
     }
 
-    public void handleReceivedMessage(Message message) {
-        if (message instanceof UserMessage) {
-            UserMessage userMessage = (UserMessage) message;
-            for (Client friend : friends) {
-                if (friend.getName().equals(userMessage.getTo())) {
-                    friend.send(message);
-                }
+    public void handleReceivedMessage(UserMessage message) {
+        for (Client friend : friends) {
+            if (friend.getName().equals(message.getTo())) {
+                friend.send(message);
             }
-
         }
+    }
+
+
+    public void addFriend(Client client) {
+        friends.add(client);
     }
 
     public String getName() {

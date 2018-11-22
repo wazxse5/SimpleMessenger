@@ -28,6 +28,10 @@ public class MainController {
         inputTF.setText("");
     }
 
+    public void handleReceivedMessage(String from, String message) {
+        outputTA.setText(outputTA.getText() + "\n" + from + ": " + message);
+    }
+
 
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;

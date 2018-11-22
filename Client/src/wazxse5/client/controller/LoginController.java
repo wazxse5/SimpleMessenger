@@ -64,10 +64,12 @@ public class LoginController {
             MainController mainController = loader.getController();
             mainController.setPrimaryStage(primaryStage);
             mainController.setThreadClient(threadClient);
+            threadClient.setMainController(mainController);
 
             Scene scene = new Scene(parent);
             primaryStage.setScene(scene);
             primaryStage.setResizable(true);
+            primaryStage.setTitle(loginTF.getText());
             primaryStage.setOnCloseRequest(event -> threadClient.close());
         } catch (IOException e) {
             infoLabel.setText("Nie można wczytać widoku okna");
