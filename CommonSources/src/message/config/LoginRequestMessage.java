@@ -8,16 +8,10 @@ public class LoginRequestMessage extends ServerMessage {
     private final String password;
     private final boolean guest;
 
-    public LoginRequestMessage(String name, String password) {
+    public LoginRequestMessage(String name, String password, boolean guest) {
         this.name = name;
         this.password = password;
-        this.guest = false;
-    }
-
-    public LoginRequestMessage(String name) {
-        this.name = name;
-        this.password = null;
-        this.guest = true;
+        this.guest = guest;
     }
 
     public String getName() {

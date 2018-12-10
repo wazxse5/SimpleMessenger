@@ -6,11 +6,11 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
 import wazxse5.client.ThreadClient;
+import wazxse5.client.ViewManager;
 
 public class MainController {
-    private Stage primaryStage;
+    private ViewManager viewManager;
     private ThreadClient threadClient;
     private StringProperty selectedFriend = new SimpleStringProperty();
 
@@ -32,15 +32,13 @@ public class MainController {
         outputTA.setText(outputTA.getText() + "\n" + from + ": " + message);
     }
 
-
-    public void setPrimaryStage(Stage primaryStage) {
-        this.primaryStage = primaryStage;
-    }
-
     public void setThreadClient(ThreadClient threadClient) {
         this.threadClient = threadClient;
         connectedClientsList.itemsProperty().bind(threadClient.connectedFriendsProperty());
-        primaryStage.setOnCloseRequest(event -> threadClient.close());
+    }
+
+    public void setViewManager(ViewManager viewManager) {
+        this.viewManager = viewManager;
     }
 
 }

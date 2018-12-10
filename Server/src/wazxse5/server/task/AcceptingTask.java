@@ -31,7 +31,7 @@ public class AcceptingTask extends Task<Client> {
                 Socket socket = serverSocket.accept();
                 Connection connection = new Connection(socket);
                 AuthenticationTask authenticationTask = new AuthenticationTask(clientsLoader, connection);
-                authenticationTask.setOnSucceeded(event -> returnConnectedClient(event));
+                authenticationTask.setOnSucceeded(this::returnConnectedClient);
                 executor.submit(authenticationTask);
             } catch (SocketTimeoutException ignored) {
             }
