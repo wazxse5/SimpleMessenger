@@ -1,9 +1,9 @@
 package wazxse5.server;
 
-import message.Message;
-import message.UserMessage;
-import message.config.GoodbyeMessage;
-import message.config.ServerMessage;
+import wazxse5.common.message.Message;
+import wazxse5.common.message.UserMessage;
+import wazxse5.common.message.config.GoodbyeMessage;
+import wazxse5.common.message.config.ServerMessage;
 import wazxse5.server.task.AcceptingTask;
 import wazxse5.server.task.ReceiveTask;
 import wazxse5.server.task.UpdatingConnectedTask;

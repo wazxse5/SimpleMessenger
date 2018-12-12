@@ -1,6 +1,7 @@
 package wazxse5.client;
 
-import message.Message;
+import wazxse5.common.UserInfo;
+import wazxse5.common.message.Message;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -8,13 +9,13 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public class Connection {
-    private final User user;
+    private final UserInfo userInfo;
     private final Socket socket;
     private ObjectInputStream input;
     private ObjectOutputStream output;
 
-    public Connection(User user, Socket socket, ObjectInputStream input, ObjectOutputStream output) {
-        this.user = user;
+    public Connection(UserInfo userInfo, Socket socket, ObjectInputStream input, ObjectOutputStream output) {
+        this.userInfo = userInfo;
         this.socket = socket;
         this.input = input;
         this.output = output;
@@ -51,7 +52,7 @@ public class Connection {
         return socket.getPort();
     }
 
-    public User getUser() {
-        return user;
+    public UserInfo getUserInfo() {
+        return userInfo;
     }
 }

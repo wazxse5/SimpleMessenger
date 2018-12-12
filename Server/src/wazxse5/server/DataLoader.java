@@ -1,9 +1,9 @@
 package wazxse5.server;
 
-import exception.AuthenticationException;
-import exception.NameIsInUseException;
-import exception.NoSuchUserException;
-import exception.WrongPasswordException;
+import wazxse5.common.exception.AuthenticationException;
+import wazxse5.common.exception.LoginIsInUseException;
+import wazxse5.common.exception.NoSuchUserException;
+import wazxse5.common.exception.WrongPasswordException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,7 @@ public class DataLoader {
     public synchronized User register(String name, String password) throws AuthenticationException {
         for (User c : users) {
             if (c.getName().equals(name)) {
-                throw new NameIsInUseException();
+                throw new LoginIsInUseException();
             }
         }
         User user = new User(name, false);
@@ -41,10 +41,10 @@ public class DataLoader {
         return user;
     }
 
-    private synchronized User loginAsGuest(String name) throws NameIsInUseException {
+    private synchronized User loginAsGuest(String name) throws LoginIsInUseException {
         for (User c : users) {
             if (c.getName().equals(name)) {
-                throw new NameIsInUseException();
+                throw new LoginIsInUseException();
             }
         }
         User user = new User(name, true, users);

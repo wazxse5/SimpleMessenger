@@ -1,4 +1,4 @@
-package message;
+package wazxse5.common.message;
 
 public class UserMessage extends Message {
     private static final long serialVersionUID = 6629966587887294896L;

@@ -1,4 +1,4 @@
-package message.config;
+package wazxse5.common.message.config;
 
 import java.util.List;
 

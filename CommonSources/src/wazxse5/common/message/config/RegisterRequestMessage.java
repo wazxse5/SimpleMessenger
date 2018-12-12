@@ -1,4 +1,4 @@
-package message.config;
+package wazxse5.common.message.config;
 
 public class RegisterRequestMessage extends ServerMessage {
     private static final long serialVersionUID = -7066000756945334003L;

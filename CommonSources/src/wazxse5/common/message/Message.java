@@ -1,4 +1,4 @@
-package message;
+package wazxse5.common.message;
 
 import java.io.Serializable;
 

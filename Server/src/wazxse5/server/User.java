@@ -1,7 +1,8 @@
 package wazxse5.server;
 
-import message.Message;
-import message.UserMessage;
+import wazxse5.common.UserInfo;
+import wazxse5.common.message.Message;
+import wazxse5.common.message.UserMessage;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -11,6 +12,9 @@ import java.util.concurrent.Executors;
 
 public class User {
     private String name;
+    private String surname;
+    private String mail;
+    private String login;
     private boolean guest;
 
     private boolean connected;
@@ -73,5 +77,9 @@ public class User {
 
     public boolean isGuest() {
         return guest;
+    }
+
+    public UserInfo getUserInfo() {
+        return new UserInfo(name, surname, mail, login, guest);
     }
 }

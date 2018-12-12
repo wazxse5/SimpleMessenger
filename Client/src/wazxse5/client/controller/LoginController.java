@@ -29,6 +29,7 @@ public class LoginController {
         try {
             String address = serverAddressTF.getText();
             int port = Integer.parseInt(serverPortTF.getText());
+            if (port < 0 || port > 65535) throw new NumberFormatException();
             String login = loginTF.getText();
             String password = passwordTF.getText();
 
@@ -36,6 +37,10 @@ public class LoginController {
         } catch (NumberFormatException exception) {
             infoLabel.setText("Niepoprawny port");
         }
+    }
+
+    public void setInfoLabelText(String text) {
+        this.infoLabel.setText(text);
     }
 
     public void setViewManager(ViewManager viewManager) {

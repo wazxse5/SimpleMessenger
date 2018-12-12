@@ -1,7 +1,7 @@
 package wazxse5.client.task;
 
 import javafx.concurrent.Task;
-import message.Message;
+import wazxse5.common.message.Message;
 
 import java.io.ObjectInputStream;
 

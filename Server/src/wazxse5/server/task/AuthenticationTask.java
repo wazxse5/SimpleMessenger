@@ -1,11 +1,11 @@
 package wazxse5.server.task;
 
-import exception.AuthenticationException;
 import javafx.concurrent.Task;
-import message.config.LoginAnswerMessage;
-import message.config.LoginRequestMessage;
-import message.config.RegisterAnswerMessage;
-import message.config.RegisterRequestMessage;
+import wazxse5.common.exception.AuthenticationException;
+import wazxse5.common.message.config.LoginAnswerMessage;
+import wazxse5.common.message.config.LoginRequestMessage;
+import wazxse5.common.message.config.RegisterAnswerMessage;
+import wazxse5.common.message.config.RegisterRequestMessage;
 import wazxse5.server.Connection;
 import wazxse5.server.DataLoader;
 import wazxse5.server.User;

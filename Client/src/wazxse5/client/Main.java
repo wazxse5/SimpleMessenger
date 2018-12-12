@@ -10,7 +10,7 @@ public class Main extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         ThreadClient threadClient = new ThreadClient();
         ViewManager viewManager = new ViewManager(primaryStage, threadClient);
         threadClient.setViewManager(viewManager);

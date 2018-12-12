@@ -5,11 +5,12 @@ import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import message.Message;
-import message.UserMessage;
-import message.config.SessionMessage;
+import javafx.concurrent.Worker;
 import wazxse5.client.task.ConnectTask;
 import wazxse5.client.task.ReceiveTask;
+import wazxse5.common.message.Message;
+import wazxse5.common.message.UserMessage;
+import wazxse5.common.message.config.SessionMessage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,21 +34,28 @@ public class ThreadClient {
 
     public void connect(String address, int port, String login, String password, boolean guest) {
         ConnectTask connectTask = new ConnectTask(address, port, login, password, guest);
-        connectTask.setOnSucceeded(event -> handleConnection((Connection) event.getSource().getValue()));
+        connectTask.setOnSucceeded(event -> handleConnectionSucceed(event.getSource()));
+        connectTask.setOnFailed(event -> handleConnectionFailed(event.getSource()));
         executor.execute(connectTask);
     }
 
-    private void handleConnection(Connection newConnection) {
-        if (newConnection != null) {
-            connection = newConnection;
-            receiveTask = new ReceiveTask(newConnection.getInput());
+    private void handleConnectionSucceed(Worker workerConnectTask) {
+        Object objectConnection = workerConnectTask.getValue();
+        if (objectConnection != null) {
+            connection = (Connection) objectConnection;
+            receiveTask = new ReceiveTask(connection.getInput());
             receiveTask.valueProperty().addListener((observable, oldValue, newValue) -> handleReceivedMessage(newValue));
             executor.execute(receiveTask);
+            viewManager.loadMainScene();
         }
     }
 
+    private void handleConnectionFailed(Worker workerConnectTask) {
+        viewManager.handleLoginError(workerConnectTask.getException());
+    }
+
     public void send(String to, String message) {
-        connection.send(new UserMessage(connection.getUser().getLogin(), to, message));
+        connection.send(new UserMessage(connection.getUserInfo().getLogin(), to, message));
     }
 
     private void handleReceivedMessage(Message message) {
@@ -76,9 +84,9 @@ public class ThreadClient {
     }
 
     public void close() {
-        connection.close();
-        receiveTask.cancel(true);
-        executor.shutdown();
+        if (connection != null) connection.close();
+        if (receiveTask != null) receiveTask.cancel(true);
+        if (executor != null) executor.shutdown();
     }
 
     public void setViewManager(ViewManager viewManager) {

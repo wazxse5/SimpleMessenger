@@ -1,8 +1,8 @@
 package wazxse5.server;
 
 import javafx.concurrent.Task;
-import message.Message;
 import org.omg.CORBA.Object;
+import wazxse5.common.message.Message;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

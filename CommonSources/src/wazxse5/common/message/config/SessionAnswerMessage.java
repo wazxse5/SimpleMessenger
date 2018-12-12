@@ -1,4 +1,4 @@
-package message.config;
+package wazxse5.common.message.config;
 
 public class SessionAnswerMessage extends ServerMessage {
     private static final long serialVersionUID = 3465662164063416415L;

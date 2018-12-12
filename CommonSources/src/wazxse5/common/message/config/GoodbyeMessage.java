@@ -1,4 +1,4 @@
-package message.config;
+package wazxse5.common.message.config;
 
 public class GoodbyeMessage extends ServerMessage {
     private static final long serialVersionUID = -711089946246577100L;
