@@ -1,7 +1,5 @@
 package message.config;
 
-import message.ServerMessage;
-
 public class GoodbyeMessage extends ServerMessage {
     private static final long serialVersionUID = -711089946246577100L;
     private final String goodbye;

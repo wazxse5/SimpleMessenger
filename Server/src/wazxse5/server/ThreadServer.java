@@ -1,12 +1,12 @@
 package wazxse5.server;
 
 import message.Message;
-import message.ServerMessage;
 import message.UserMessage;
 import message.config.GoodbyeMessage;
+import message.config.ServerMessage;
 import wazxse5.server.task.AcceptingTask;
 import wazxse5.server.task.ReceiveTask;
-import wazxse5.server.task.UpdatingConnectedClientsTask;
+import wazxse5.server.task.UpdatingConnectedTask;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -24,28 +24,28 @@ public class ThreadServer {
     private AcceptingTask acceptingTask;
     private Future updatingConnectedClientsFuture;
 
-    private final ClientsLoader clientsLoader;
-    private final List<Client> connectedClients;
+    private final DataLoader dataLoader;
+    private final List<User> connectedUsers;
 
     public ThreadServer(int port) {
         this.port = port;
 
         executor = Executors.newCachedThreadPool();
 
-        clientsLoader = new ClientsLoader();
-        connectedClients = new ArrayList<>();
+        dataLoader = new DataLoader();
+        connectedUsers = new ArrayList<>();
     }
 
     public void start() {
         try {
             ServerSocket serverSocket = new ServerSocket(port);
 
-            acceptingTask = new AcceptingTask(serverSocket, clientsLoader);
+            acceptingTask = new AcceptingTask(serverSocket, dataLoader);
             acceptingTask.valueProperty().addListener((observable, oldValue, newValue) -> addNewConnectedClient(newValue));
             acceptingTaskFuture = executor.submit(acceptingTask);
 
-            UpdatingConnectedClientsTask updatingConnectedClientsTask = new UpdatingConnectedClientsTask(this);
-            updatingConnectedClientsFuture = executor.submit(updatingConnectedClientsTask);
+            UpdatingConnectedTask updatingConnectedTask = new UpdatingConnectedTask(this);
+            updatingConnectedClientsFuture = executor.submit(updatingConnectedTask);
 
 
         } catch (IOException e) {
@@ -53,23 +53,23 @@ public class ThreadServer {
         }
     }
 
-    private void addNewConnectedClient(Client client) {
-        connectedClients.add(client);
-        ReceiveTask receiveTask = new ReceiveTask(client.getConnection().getInputStream());
-        receiveTask.valueProperty().addListener((observable, oldValue, newValue) -> handleReceivedMessage(client, newValue));
+    private void addNewConnectedClient(User user) {
+        connectedUsers.add(user);
+        ReceiveTask receiveTask = new ReceiveTask(user.getConnection().getInputStream());
+        receiveTask.valueProperty().addListener((observable, oldValue, newValue) -> handleReceivedMessage(user, newValue));
         executor.submit(receiveTask);
     }
 
-    private void handleReceivedMessage(Client client, Message message) {
+    private void handleReceivedMessage(User user, Message message) {
         if (message instanceof UserMessage) {
             UserMessage userMessage = (UserMessage) message;
-            client.handleReceivedMessage(userMessage);
+            user.handleReceivedMessage(userMessage);
         } else if (message instanceof ServerMessage) {
             if (message instanceof GoodbyeMessage) {
-                client.setConnected(false);
-                connectedClients.remove(client);
+                user.setConnected(false);
+                connectedUsers.remove(user);
                 try {
-                    client.getConnection().close();
+                    user.getConnection().close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -77,8 +77,8 @@ public class ThreadServer {
         }
     }
 
-    public List<Client> getConnectedClients() {
-        return connectedClients;
+    public List<User> getConnectedUsers() {
+        return connectedUsers;
     }
 
     public void close() {

@@ -2,9 +2,9 @@ package wazxse5.server.task;
 
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
-import wazxse5.server.Client;
-import wazxse5.server.ClientsLoader;
 import wazxse5.server.Connection;
+import wazxse5.server.DataLoader;
+import wazxse5.server.User;
 
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -12,25 +12,25 @@ import java.net.SocketTimeoutException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class AcceptingTask extends Task<Client> {
+public class AcceptingTask extends Task<User> {
     private final ServerSocket serverSocket;
-    private final ClientsLoader clientsLoader;
+    private final DataLoader dataLoader;
     private final ExecutorService executor;
 
 
-    public AcceptingTask(ServerSocket serverSocket, ClientsLoader clientsLoader) {
+    public AcceptingTask(ServerSocket serverSocket, DataLoader dataLoader) {
         this.serverSocket = serverSocket;
-        this.clientsLoader = clientsLoader;
+        this.dataLoader = dataLoader;
         this.executor = Executors.newCachedThreadPool();
     }
 
-    @Override protected Client call() throws Exception {
+    @Override protected User call() throws Exception {
         serverSocket.setSoTimeout(100);
         while (!isCancelled()) {
             try {
                 Socket socket = serverSocket.accept();
                 Connection connection = new Connection(socket);
-                AuthenticationTask authenticationTask = new AuthenticationTask(clientsLoader, connection);
+                AuthenticationTask authenticationTask = new AuthenticationTask(dataLoader, connection);
                 authenticationTask.setOnSucceeded(this::returnConnectedClient);
                 executor.submit(authenticationTask);
             } catch (SocketTimeoutException ignored) {
@@ -44,9 +44,9 @@ public class AcceptingTask extends Task<Client> {
     }
 
     private void returnConnectedClient(WorkerStateEvent authenticationFinished) {
-        Client client = (Client) authenticationFinished.getSource().getValue();
-        if (client != null) {
-            updateValue(client);
+        User user = (User) authenticationFinished.getSource().getValue();
+        if (user != null) {
+            updateValue(user);
         }
     }
 

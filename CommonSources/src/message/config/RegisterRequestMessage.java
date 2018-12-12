@@ -1,7 +1,5 @@
 package message.config;
 
-import message.ServerMessage;
-
 public class RegisterRequestMessage extends ServerMessage {
     private static final long serialVersionUID = -7066000756945334003L;
     private final String name;

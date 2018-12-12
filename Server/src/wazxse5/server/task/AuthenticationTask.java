@@ -6,65 +6,65 @@ import message.config.LoginAnswerMessage;
 import message.config.LoginRequestMessage;
 import message.config.RegisterAnswerMessage;
 import message.config.RegisterRequestMessage;
-import wazxse5.server.Client;
-import wazxse5.server.ClientsLoader;
 import wazxse5.server.Connection;
+import wazxse5.server.DataLoader;
+import wazxse5.server.User;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 
-public class AuthenticationTask extends Task<Client> {
+public class AuthenticationTask extends Task<User> {
     private final Connection connection;
-    private final ClientsLoader clientsLoader;
+    private final DataLoader dataLoader;
 
-    public AuthenticationTask(ClientsLoader clientsLoader, Connection connection) {
+    public AuthenticationTask(DataLoader dataLoader, Connection connection) {
         this.connection = connection;
-        this.clientsLoader = clientsLoader;
+        this.dataLoader = dataLoader;
     }
 
 
-    @Override protected Client call() {
-        Client client = null;
+    @Override protected User call() {
+        User user = null;
         try {
             ObjectInputStream input = connection.getInputStream();
 
             Object authenticationObject = input.readObject();
             if (authenticationObject instanceof LoginRequestMessage) {
-                client = login(authenticationObject);
+                user = login(authenticationObject);
             } else if (authenticationObject instanceof RegisterRequestMessage) {
-                client = register(authenticationObject);
+                user = register(authenticationObject);
             }
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
-        return client;
+        return user;
     }
 
-    private Client login(Object authenticationObject) throws IOException {
+    private User login(Object authenticationObject) throws IOException {
         LoginRequestMessage loginRequest = (LoginRequestMessage) authenticationObject;
         String name = loginRequest.getName();
         String password = loginRequest.getPassword();
         boolean isGuest = loginRequest.isGuest();
         try {
-            Client client = clientsLoader.login(name, password, isGuest);
+            User user = dataLoader.login(name, password, isGuest);
             connection.send(new LoginAnswerMessage(true));
-            client.setConnected(true);
-            client.setConnection(connection);
-            return client;
+            user.setConnected(true);
+            user.setConnection(connection);
+            return user;
         } catch (AuthenticationException e) {
             connection.send(new LoginAnswerMessage(false, e.getCode()));
         }
         return null;
     }
 
-    private Client register(Object authenticationObject) throws IOException {
+    private User register(Object authenticationObject) throws IOException {
         RegisterRequestMessage registerRequest = (RegisterRequestMessage) authenticationObject;
         String name = registerRequest.getName();
         String password = registerRequest.getPassword();
         try {
-            Client client = clientsLoader.register(name, password);
+            User user = dataLoader.register(name, password);
             connection.send(new RegisterAnswerMessage(true));
-            return client;
+            return user;
         } catch (AuthenticationException e) {
             connection.send(new RegisterAnswerMessage(false, e.getCode()));
         }

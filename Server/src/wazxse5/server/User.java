@@ -9,24 +9,24 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class Client {
+public class User {
     private String name;
     private boolean guest;
 
     private boolean connected;
     private Connection connection;
 
-    private List<Client> friends;
+    private List<User> friends;
 
     private ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    public Client(String name, boolean guest, List<Client> friends) {
+    public User(String name, boolean guest, List<User> friends) {
         this.name = name;
         this.guest = guest;
         this.friends = friends;
     }
 
-    public Client(String name, boolean guest) {
+    public User(String name, boolean guest) {
         this(name, guest, new ArrayList<>());
     }
 
@@ -39,7 +39,7 @@ public class Client {
     }
 
     public void handleReceivedMessage(UserMessage message) {
-        for (Client friend : friends) {
+        for (User friend : friends) {
             if (friend.getName().equals(message.getTo())) {
                 friend.send(message);
             }
@@ -47,8 +47,8 @@ public class Client {
     }
 
 
-    public void addFriend(Client client) {
-        friends.add(client);
+    public void addFriend(User user) {
+        friends.add(user);
     }
 
     public String getName() {

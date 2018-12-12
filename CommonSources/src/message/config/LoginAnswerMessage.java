@@ -1,7 +1,5 @@
 package message.config;
 
-import message.ServerMessage;
-
 public class LoginAnswerMessage extends ServerMessage {
     private static final long serialVersionUID = 6846450951913670969L;
     private final boolean good;

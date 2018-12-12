@@ -1,7 +1,5 @@
 package message.config;
 
-import message.ServerMessage;
-
 import java.util.List;
 
 public class SessionMessage extends ServerMessage {
