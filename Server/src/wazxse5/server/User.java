@@ -7,8 +7,6 @@ import wazxse5.common.message.UserMessage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class User {
     private String name;
@@ -21,8 +19,6 @@ public class User {
     private Connection connection;
 
     private List<User> friends;
-
-    private ExecutorService executor = Executors.newSingleThreadExecutor();
 
     public User(String name, boolean guest, List<User> friends) {
         this.name = name;
