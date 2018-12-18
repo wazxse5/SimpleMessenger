@@ -1,26 +1,22 @@
 package wazxse5.common.message.config;
 
+import wazxse5.common.UserInfo;
+
 public class RegisterRequestMessage extends ServerMessage {
     private static final long serialVersionUID = -7066000756945334003L;
-    private final String name;
-    private final String password;
-    private final String mail;
+    private final UserInfo userInfo;
+    private final byte[] password;
 
-    public RegisterRequestMessage(String name, String password, String mail) {
-        this.name = name;
+    public RegisterRequestMessage(UserInfo userInfo, byte[] password) {
+        this.userInfo = userInfo;
         this.password = password;
-        this.mail = mail;
     }
 
-    public String getName() {
-        return name;
+    public UserInfo getUserInfo() {
+        return userInfo;
     }
 
-    public String getPassword() {
+    public byte[] getPassword() {
         return password;
-    }
-
-    public String getMail() {
-        return mail;
     }
 }

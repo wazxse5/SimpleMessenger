@@ -9,13 +9,12 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public class Connection {
-    private final UserInfo userInfo;
     private final Socket socket;
-    private ObjectInputStream input;
-    private ObjectOutputStream output;
+    private final ObjectInputStream input;
+    private final ObjectOutputStream output;
+    private UserInfo userInfo;
 
-    public Connection(UserInfo userInfo, Socket socket, ObjectInputStream input, ObjectOutputStream output) {
-        this.userInfo = userInfo;
+    public Connection(Socket socket, ObjectInputStream input, ObjectOutputStream output) {
         this.socket = socket;
         this.input = input;
         this.output = output;
@@ -34,6 +33,10 @@ public class Connection {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void setUserInfo(UserInfo userInfo) {
+        this.userInfo = userInfo;
     }
 
     public ObjectInputStream getInput() {

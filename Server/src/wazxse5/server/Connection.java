@@ -1,7 +1,5 @@
 package wazxse5.server;
 
-import javafx.concurrent.Task;
-import org.omg.CORBA.Object;
 import wazxse5.common.message.Message;
 
 import java.io.IOException;
@@ -9,10 +7,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-public class Connection extends Task {
+public class Connection {
     private final Socket socket;
     private ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
+    private User user;
 
 
     public Connection(Socket socket) {
@@ -26,12 +25,16 @@ public class Connection extends Task {
     }
 
 
-    @Override protected Object call() {
-        return null;
+    public void send(Message message) {
+        try {
+            outputStream.writeObject(message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void send(Message message) throws IOException {
-        outputStream.writeObject(message);
+    public User getUser() {
+        return user;
     }
 
     public void close() throws IOException {

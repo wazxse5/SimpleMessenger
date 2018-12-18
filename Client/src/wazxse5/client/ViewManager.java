@@ -5,8 +5,8 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import wazxse5.client.controller.LoginController;
 import wazxse5.client.controller.MainController;
-import wazxse5.common.exception.LoginIsInUseException;
-import wazxse5.common.exception.NoSuchUserException;
+import wazxse5.common.exception.LoginIsNotAvailableException;
+import wazxse5.common.exception.LoginNotExistsException;
 import wazxse5.common.exception.WrongPasswordException;
 
 import java.io.IOException;
@@ -58,10 +58,10 @@ public class ViewManager {
     }
 
     public void handleLoginError(Throwable exception) {
-        if (exception instanceof LoginIsInUseException) loginController.setInfoLabelText("Ten login jest zajęty");
-        else if (exception instanceof NoSuchUserException)
-            loginController.setInfoLabelText("Nie ma takiego użytkownika");
-        else if (exception instanceof WrongPasswordException) loginController.setInfoLabelText("Nieprawidłowe hasło");
-        else loginController.setInfoLabelText("Nie można nawiązać połączenia");
+        if (exception instanceof LoginIsNotAvailableException) loginController.setInfoLText("Ten login jest zajęty");
+        else if (exception instanceof LoginNotExistsException)
+            loginController.setInfoLText("Nie ma takiego użytkownika");
+        else if (exception instanceof WrongPasswordException) loginController.setInfoLText("Nieprawidłowe hasło");
+        else loginController.setInfoLText("Nie można nawiązać połączenia");
     }
 }

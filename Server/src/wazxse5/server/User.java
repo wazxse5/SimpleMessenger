@@ -4,38 +4,22 @@ import wazxse5.common.UserInfo;
 import wazxse5.common.message.Message;
 import wazxse5.common.message.UserMessage;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class User {
-    private String name;
-    private String surname;
-    private String mail;
-    private String login;
-    private boolean guest;
-
+    private UserInfo userInfo;
     private boolean connected;
     private Connection connection;
 
     private List<User> friends;
 
-    public User(String name, boolean guest, List<User> friends) {
-        this.name = name;
-        this.guest = guest;
+    public User(UserInfo userInfo, List<User> friends) {
         this.friends = friends;
     }
 
-    public User(String name, boolean guest) {
-        this(name, guest, new ArrayList<>());
-    }
-
     public void send(Message message) {
-        try {
-            connection.send(message);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        connection.send(message);
+
     }
 
     public void handleReceivedMessage(UserMessage message) {
@@ -46,13 +30,13 @@ public class User {
         }
     }
 
+    public String getName() {
+        return userInfo.getName();
+    }
+
 
     public void addFriend(User user) {
         friends.add(user);
-    }
-
-    public String getName() {
-        return name;
     }
 
     public boolean isConnected() {
@@ -71,11 +55,8 @@ public class User {
         this.connection = connection;
     }
 
-    public boolean isGuest() {
-        return guest;
-    }
 
     public UserInfo getUserInfo() {
-        return new UserInfo(name, surname, mail, login, guest);
+        return userInfo;
     }
 }

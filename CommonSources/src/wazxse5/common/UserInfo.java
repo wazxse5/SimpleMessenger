@@ -4,11 +4,11 @@ import java.io.Serializable;
 
 public class UserInfo implements Serializable {
     private static final long serialVersionUID = -3865294124979558539L;
-    private String name;
-    private String surname;
-    private String mail;
-    private String login;
-    private boolean guest;
+    private final String name;
+    private final String surname;
+    private final String mail;
+    private final String login;
+    private final boolean guest;
 
     public UserInfo(String name, String surname, String mail, String login, boolean guest) {
         this.name = name;
@@ -32,5 +32,9 @@ public class UserInfo implements Serializable {
 
     public String getLogin() {
         return login;
+    }
+
+    public boolean isGuest() {
+        return guest;
     }
 }

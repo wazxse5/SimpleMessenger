@@ -8,8 +8,13 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Worker;
 import wazxse5.client.task.ConnectTask;
 import wazxse5.client.task.ReceiveTask;
+import wazxse5.common.UserInfo;
+import wazxse5.common.exception.AuthenticationException;
 import wazxse5.common.message.Message;
 import wazxse5.common.message.UserMessage;
+import wazxse5.common.message.config.LoginAnswerMessage;
+import wazxse5.common.message.config.LoginRequestMessage;
+import wazxse5.common.message.config.RegisterRequestMessage;
 import wazxse5.common.message.config.SessionMessage;
 
 import java.util.ArrayList;
@@ -32,11 +37,25 @@ public class ThreadClient {
         connectedFriendsProperty.setValue(connectedFriendsList);
     }
 
-    public void connect(String address, int port, String login, String password, boolean guest) {
-        ConnectTask connectTask = new ConnectTask(address, port, login, password, guest);
+    public void connect(String address, int port) {
+        ConnectTask connectTask = new ConnectTask(address, port);
         connectTask.setOnSucceeded(event -> handleConnectionSucceed(event.getSource()));
         connectTask.setOnFailed(event -> handleConnectionFailed(event.getSource()));
         executor.execute(connectTask);
+    }
+
+    public void sendLoginRequest(String address, int port, String login, byte[] password, boolean guest) {
+        if (connection == null) connect(address, port);
+        if (connection != null) {
+            connection.send(new LoginRequestMessage(login, password, guest));
+        }
+    }
+
+    public void sendRegisterRequest(String address, int port, UserInfo userInfo, byte[] password) {
+        if (connection == null) connect(address, port);
+        if (connection != null) {
+            connection.send(new RegisterRequestMessage(userInfo, password));
+        }
     }
 
     private void handleConnectionSucceed(Worker workerConnectTask) {
@@ -46,7 +65,6 @@ public class ThreadClient {
             receiveTask = new ReceiveTask(connection.getInput());
             receiveTask.valueProperty().addListener((observable, oldValue, newValue) -> handleReceivedMessage(newValue));
             executor.execute(receiveTask);
-            viewManager.loadMainScene();
         }
     }
 
@@ -65,6 +83,15 @@ public class ThreadClient {
         if (message instanceof SessionMessage) {
             SessionMessage sessionMessage = (SessionMessage) message;
             updateConnectedFriends(sessionMessage.getConncectedClientsNames());
+        }
+        if (message instanceof LoginAnswerMessage) {
+            LoginAnswerMessage loginAnswerMessage = (LoginAnswerMessage) message;
+            if (loginAnswerMessage.isGood()) connection.setUserInfo(loginAnswerMessage.getUserInfo());
+            else try {
+                throw loginAnswerMessage.getException();
+            } catch (AuthenticationException e) {
+                e.printStackTrace();
+            }
         }
     }
 

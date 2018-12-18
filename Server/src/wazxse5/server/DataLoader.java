@@ -1,75 +1,53 @@
 package wazxse5.server;
 
-import wazxse5.common.exception.AuthenticationException;
-import wazxse5.common.exception.LoginIsInUseException;
-import wazxse5.common.exception.NoSuchUserException;
-import wazxse5.common.exception.WrongPasswordException;
+import wazxse5.common.UserInfo;
+import wazxse5.common.exception.*;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DataLoader {
-    private List<User> users;
+    private MysqlConnector mysqlConnector;
+    private List<User> knownUsers;
+    private List<User> guests;
 
     public DataLoader() {
-        users = new ArrayList<>();
-        load();
+        knownUsers = new ArrayList<>();
+        try {
+            mysqlConnector = new MysqlConnector();
+            mysqlConnector.connect("localhost", "messenger", "root", "");
+        } catch (Exception ignored) {
+        } // TODO: 17.12.2018 Dopisać obsługę błędu połączenia z bazą
     }
 
-    public void load() {
-        users.add(new User("test", false));
-        users.add(new User("wazxse5", false));
-
-        for (User user : users) for (User friend : users) if (user != friend) user.addFriend(friend);
-    }
-
-    public synchronized User register(String name, String password) throws AuthenticationException {
-        for (User c : users) {
-            if (c.getName().equals(name)) {
-                throw new LoginIsInUseException();
-            }
+    public synchronized void register(UserInfo userInfo, byte[] password) {
+        try {
+            String a = mysqlConnector.registerUser(userInfo, password);
+            System.out.println("a = " + a);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        User user = new User(name, false);
-        users.add(user);
-        return user;
     }
 
-    public synchronized User login(String name, String password, boolean isGuest) throws AuthenticationException {
-        User user;
-        if (isGuest) user = loginAsGuest(name);
-        else user = loginAsUser(name, password);
-        return user;
-    }
-
-    private synchronized User loginAsGuest(String name) throws LoginIsInUseException {
-        for (User c : users) {
-            if (c.getName().equals(name)) {
-                throw new LoginIsInUseException();
-            }
+    public synchronized User login(String userName, byte[] password, boolean isGuest) throws AuthenticationException, SQLException {
+        if (isGuest) {
+            if (mysqlConnector.isUserNameAvailable(userName)) {
+                User guest = null; // FIXME: 18.12.2018
+                guests.add(guest);
+            } else throw new LoginIsNotAvailableException();
+        } else {
+            String result = mysqlConnector.loginUser(userName, password);
+            int passwordAttempts = Character.getNumericValue(result.indexOf(0));
+            result = result.substring(1);
+            if (result.equals("ok")) {
+                // TODO: 17.12.2018 Dopisać pobieranie danych o użytkowniku
+                return null;
+            } else if (result.equals("no_attempt")) throw new NoPasswordAttemptsException();
+            else if (result.equals("wrong_pass")) throw new WrongPasswordException(passwordAttempts);
+            else if (result.equals("no_user")) throw new LoginNotExistsException();
         }
-        User user = new User(name, true, users);
-        users.add(user);
-        return user;
+        return null;
     }
-
-    private User loginAsUser(String name, String password) throws WrongPasswordException, NoSuchUserException {
-        for (User c : users) {
-            if (c.getName().equals(name)) {
-                // TODO: Dodać sprawdzanie czy klient nie został już zaologowany
-                if (checkPassword(c, password)) {
-                    return c;
-                } else throw new WrongPasswordException();
-            }
-        }
-        throw new NoSuchUserException();
-    }
-
-    private boolean checkPassword(User user, String password) {
-        // TODO: sprawdzanie hasła z pliku
-        if (user.getName().equals("wazxse5") && password.equals("1234")) return true;
-        else if (user.getName().equals("test") && password.equals("0000")) return true;
-        else return false;
-    }
-
 
 }
