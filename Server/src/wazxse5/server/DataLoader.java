@@ -41,8 +41,7 @@ public class DataLoader {
             int passwordAttempts = Character.getNumericValue(result.indexOf(0));
             result = result.substring(1);
             if (result.equals("ok")) {
-                // TODO: 17.12.2018 Dopisać pobieranie danych o użytkowniku
-                return null;
+                return new User();
             } else if (result.equals("no_attempt")) throw new NoPasswordAttemptsException();
             else if (result.equals("wrong_pass")) throw new WrongPasswordException(passwordAttempts);
             else if (result.equals("no_user")) throw new LoginNotExistsException();

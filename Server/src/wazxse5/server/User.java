@@ -13,6 +13,10 @@ public class User {
 
     private List<User> friends;
 
+    public User() {
+
+    }
+
     public User(UserInfo userInfo, List<User> friends) {
         this.friends = friends;
     }

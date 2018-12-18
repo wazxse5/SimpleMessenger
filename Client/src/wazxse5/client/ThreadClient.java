@@ -1,7 +1,9 @@
 package wazxse5.client;
 
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -9,7 +11,7 @@ import javafx.concurrent.Worker;
 import wazxse5.client.task.ConnectTask;
 import wazxse5.client.task.ReceiveTask;
 import wazxse5.common.UserInfo;
-import wazxse5.common.exception.AuthenticationException;
+import wazxse5.common.exception.NoConnectionException;
 import wazxse5.common.message.Message;
 import wazxse5.common.message.UserMessage;
 import wazxse5.common.message.config.LoginAnswerMessage;
@@ -25,12 +27,13 @@ import java.util.concurrent.Executors;
 public class ThreadClient {
     private ViewManager viewManager;
     private Connection connection;
+    private ExecutorService executor;
+    private ReceiveTask receiveTask;
 
+    private BooleanProperty connected = new SimpleBooleanProperty();
     private ListProperty<String> connectedFriendsProperty = new SimpleListProperty<>();
     private ObservableList<String> connectedFriendsList = FXCollections.observableList(new ArrayList<>());
 
-    private ExecutorService executor;
-    private ReceiveTask receiveTask;
 
     public ThreadClient() {
         executor = Executors.newSingleThreadExecutor();
@@ -44,24 +47,23 @@ public class ThreadClient {
         executor.execute(connectTask);
     }
 
-    public void sendLoginRequest(String address, int port, String login, byte[] password, boolean guest) {
-        if (connection == null) connect(address, port);
+    public void sendLoginRequest(String login, byte[] password, boolean guest) {
         if (connection != null) {
             connection.send(new LoginRequestMessage(login, password, guest));
-        }
+        } else viewManager.handleLoginError(new NoConnectionException());
     }
 
-    public void sendRegisterRequest(String address, int port, UserInfo userInfo, byte[] password) {
-        if (connection == null) connect(address, port);
+    public void sendRegisterRequest(UserInfo userInfo, byte[] password) {
         if (connection != null) {
             connection.send(new RegisterRequestMessage(userInfo, password));
-        }
+        } else viewManager.handleRegisterError(new NoConnectionException());
     }
 
     private void handleConnectionSucceed(Worker workerConnectTask) {
         Object objectConnection = workerConnectTask.getValue();
         if (objectConnection != null) {
             connection = (Connection) objectConnection;
+            connected.setValue(true);
             receiveTask = new ReceiveTask(connection.getInput());
             receiveTask.valueProperty().addListener((observable, oldValue, newValue) -> handleReceivedMessage(newValue));
             executor.execute(receiveTask);
@@ -69,7 +71,7 @@ public class ThreadClient {
     }
 
     private void handleConnectionFailed(Worker workerConnectTask) {
-        viewManager.handleLoginError(workerConnectTask.getException());
+        viewManager.handleConnectError(workerConnectTask.getException());
     }
 
     public void send(String to, String message) {
@@ -86,12 +88,10 @@ public class ThreadClient {
         }
         if (message instanceof LoginAnswerMessage) {
             LoginAnswerMessage loginAnswerMessage = (LoginAnswerMessage) message;
-            if (loginAnswerMessage.isGood()) connection.setUserInfo(loginAnswerMessage.getUserInfo());
-            else try {
-                throw loginAnswerMessage.getException();
-            } catch (AuthenticationException e) {
-                e.printStackTrace();
-            }
+            if (loginAnswerMessage.isGood()) {
+                connection.setUserInfo(loginAnswerMessage.getUserInfo());
+                viewManager.loadMainScene();
+            } else viewManager.handleLoginError(loginAnswerMessage.getException());
         }
     }
 
@@ -108,6 +108,10 @@ public class ThreadClient {
 
     public ListProperty<String> connectedFriendsProperty() {
         return connectedFriendsProperty;
+    }
+
+    public BooleanProperty connectedProperty() {
+        return connected;
     }
 
     public void close() {

@@ -1,9 +1,11 @@
 package wazxse5.server;
 
 import wazxse5.common.message.Message;
+import wazxse5.common.message.config.LoginRequestMessage;
 import wazxse5.common.message.config.RegisterRequestMessage;
 import wazxse5.common.message.config.WelcomeMessage;
 import wazxse5.server.task.AcceptingTask;
+import wazxse5.server.task.LoginTask;
 import wazxse5.server.task.ReceiveTask;
 import wazxse5.server.task.UpdatingConnectedTask;
 
@@ -60,9 +62,13 @@ public class ThreadServer {
             connection.send(message);
         }
         if (message instanceof RegisterRequestMessage) {
-            System.out.println("ThreadServer.handleReceivedMessage.RegisterRequest");
             RegisterRequestMessage registerRequestMessage = (RegisterRequestMessage) message;
             dataLoader.register(registerRequestMessage.getUserInfo(), registerRequestMessage.getPassword());
+        }
+        if (message instanceof LoginRequestMessage) {
+            LoginRequestMessage loginRequestMessage = (LoginRequestMessage) message;
+            LoginTask loginTask = new LoginTask(dataLoader, connection, loginRequestMessage);
+            executor.submit(loginTask);
         }
     }
 

@@ -7,6 +7,7 @@ import wazxse5.client.controller.LoginController;
 import wazxse5.client.controller.MainController;
 import wazxse5.common.exception.LoginIsNotAvailableException;
 import wazxse5.common.exception.LoginNotExistsException;
+import wazxse5.common.exception.NoConnectionException;
 import wazxse5.common.exception.WrongPasswordException;
 
 import java.io.IOException;
@@ -17,7 +18,6 @@ public class ViewManager {
 
     private Scene mainScene;
     private Scene loginScene;
-
     private MainController mainController;
     private LoginController loginController;
 
@@ -57,11 +57,21 @@ public class ViewManager {
         stage.setScene(loginScene);
     }
 
-    public void handleLoginError(Throwable exception) {
-        if (exception instanceof LoginIsNotAvailableException) loginController.setInfoLText("Ten login jest zajęty");
-        else if (exception instanceof LoginNotExistsException)
-            loginController.setInfoLText("Nie ma takiego użytkownika");
-        else if (exception instanceof WrongPasswordException) loginController.setInfoLText("Nieprawidłowe hasło");
-        else loginController.setInfoLText("Nie można nawiązać połączenia");
+    public void handleLoginError(Throwable throwable) {
+        if (throwable instanceof LoginIsNotAvailableException)
+            loginController.setInfoText("L", "Ten login jest zajęty");
+        else if (throwable instanceof LoginNotExistsException)
+            loginController.setInfoText("L", "Nie ma takiego użytkownika");
+        else if (throwable instanceof WrongPasswordException) loginController.setInfoText("L", "Nieprawidłowe hasło");
+        else loginController.setInfoText("L", "Nie można nawiązać połączenia");
+    }
+
+    public void handleConnectError(Throwable throwable) {
+        if (throwable instanceof NoConnectionException)
+            loginController.setInfoText("C", "Nie można nawiązać połączenia");
+    }
+
+    public void handleRegisterError(Throwable throwable) {
+        if (throwable instanceof NoConnectionException) loginController.setInfoText("R", "Nie połączono");
     }
 }
