@@ -11,6 +11,7 @@ import wazxse5.common.UserInfo;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 public class LoginController {
     private ViewManager viewManager;
@@ -98,7 +99,13 @@ public class LoginController {
     private byte[] hash(String text) {
         text = text.trim();
         byte[] bytes = text.getBytes(StandardCharsets.UTF_8);
-        return messageDigest.digest(bytes);
+        byte[] hashed = messageDigest.digest(bytes);
+
+        System.out.println(bytes);
+        System.out.println(Arrays.toString(bytes));
+        System.out.println(hashed);
+        System.out.println(Arrays.toString(hashed));
+        return hashed;
     }
 
 
