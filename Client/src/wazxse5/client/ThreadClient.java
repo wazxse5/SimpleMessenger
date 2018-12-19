@@ -115,9 +115,9 @@ public class ThreadClient {
     }
 
     public void close() {
-        if (connection != null) connection.close();
-        if (receiveTask != null) receiveTask.cancel(true);
         if (executor != null) executor.shutdown();
+        if (receiveTask != null) receiveTask.cancel(true);
+        if (connection != null) connection.close();
     }
 
     public void setViewManager(ViewManager viewManager) {

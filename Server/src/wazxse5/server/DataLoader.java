@@ -24,7 +24,6 @@ public class DataLoader {
     public synchronized void register(UserInfo userInfo, byte[] password) {
         try {
             String a = mysqlConnector.registerUser(userInfo, password);
-            System.out.println("a = " + a);
         } catch (SQLException e) {
             e.printStackTrace();
         }

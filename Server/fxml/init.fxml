@@ -18,7 +18,7 @@
              AnchorPane.bottomAnchor="100.0">
            <children>
                <Label text="Port"/>
-               <TextField fx:id="portTF" prefWidth="80.0" text="8989"/>
+               <TextField fx:id="serverPortTF" prefWidth="80.0" text="8989"/>
            </children>
        </HBox>
        <Label fx:id="infoLabel" layoutX="14.0" layoutY="369.0" AnchorPane.bottomAnchor="30.0"

@@ -37,8 +37,14 @@ public class Connection {
         return user;
     }
 
-    public void close() throws IOException {
-        socket.close();
+    public void close() {
+        try {
+            if (!socket.isClosed()) socket.close();
+            inputStream.close();
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public ObjectInputStream getInputStream() {

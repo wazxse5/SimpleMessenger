@@ -21,18 +21,19 @@ public class ThreadServer {
     private final int port;
 
     private final ExecutorService executor;
-    private Future acceptingTaskFuture;
     private AcceptingTask acceptingTask;
-    private Future updatingConnectedClientsFuture;
+    private Future updatingConnectedTask;
+    private final List<ReceiveTask> receiveTasks;
 
     private final DataLoader dataLoader;
     private final List<Connection> connectedConnections;
 
     public ThreadServer(int port) {
         this.port = port;
+        this.executor = Executors.newCachedThreadPool();
+        this.receiveTasks = new ArrayList<>();
         this.dataLoader = new DataLoader();
         this.connectedConnections = new ArrayList<>();
-        this.executor = Executors.newCachedThreadPool();
     }
 
     public void start() {
@@ -41,10 +42,10 @@ public class ThreadServer {
 
             acceptingTask = new AcceptingTask(serverSocket, dataLoader);
             acceptingTask.valueProperty().addListener((observable, oldValue, newValue) -> handleNewConnection(newValue));
-            acceptingTaskFuture = executor.submit(acceptingTask);
+            executor.submit(acceptingTask);
 
             UpdatingConnectedTask updatingConnectedTask = new UpdatingConnectedTask(this);
-            updatingConnectedClientsFuture = executor.submit(updatingConnectedTask);
+            this.updatingConnectedTask = executor.submit(updatingConnectedTask);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -54,6 +55,7 @@ public class ThreadServer {
         connectedConnections.add(connection);
         ReceiveTask receiveTask = new ReceiveTask(connection.getInputStream());
         receiveTask.valueProperty().addListener((observable, oldValue, newValue) -> handleReceivedMessage(connection, newValue));
+        receiveTasks.add(receiveTask);
         executor.submit(receiveTask);
     }
 
@@ -80,9 +82,9 @@ public class ThreadServer {
 
     public void close() {
         executor.shutdown();
-        updatingConnectedClientsFuture.cancel(true);
-
-        acceptingTaskFuture.cancel(true);
-        acceptingTask.cancel(true);
+        if (acceptingTask != null) acceptingTask.cancel(true);
+        if (updatingConnectedTask != null) updatingConnectedTask.cancel(true);
+        for (ReceiveTask receiveTask : receiveTasks) receiveTask.cancel(true);
+        for (Connection connection : connectedConnections) connection.close();
     }
 }

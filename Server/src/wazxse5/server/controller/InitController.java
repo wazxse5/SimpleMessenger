@@ -1,5 +1,7 @@
 package wazxse5.server.controller;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -14,33 +16,33 @@ import java.io.IOException;
 
 public class InitController {
     private Stage primaryStage;
+    private IntegerProperty serverPort = new SimpleIntegerProperty();
 
     @FXML private Button startServerButton;
-    @FXML private TextField portTF;
+    @FXML private TextField serverPortTF;
     @FXML private Label infoLabel;
 
     public void initialize() {
-        portTF.textProperty().addListener((observable, oldValue, newValue) -> checkPortTF(newValue));
+        serverPortTF.textProperty().addListener((observable, oldValue, newValue) -> {
+            try {
+                int port = Integer.parseInt(serverPortTF.getText());
+                if (port < 0 || port > 65535) throw new NumberFormatException();
+                infoLabel.setText("");
+                startServerButton.setDisable(false);
+                serverPort.setValue(port);
+            } catch (NumberFormatException e) {
+                infoLabel.setText("Nieprawidłowy port");
+                startServerButton.setDisable(true);
+            }
+        });
     }
 
     public void startServer() {
-        ThreadServer threadServer = new ThreadServer(Integer.parseInt(portTF.getText()));
+        ThreadServer threadServer = new ThreadServer(Integer.parseInt(serverPortTF.getText()));
         threadServer.start();
         primaryStage.setOnCloseRequest((observable) -> threadServer.close());
 
         loadMainWindow();
-    }
-
-    private void checkPortTF(String value) {
-        try {
-            int i = Integer.parseInt(value);
-            if (i < 0 || i > 65535) throw new NumberFormatException();
-            startServerButton.setDisable(false);
-            infoLabel.setText("");
-        } catch (NumberFormatException e) {
-            startServerButton.setDisable(true);
-            infoLabel.setText("Niepoprawny port");
-        }
     }
 
     private void loadMainWindow() {
@@ -50,7 +52,7 @@ public class InitController {
             Scene scene = new Scene(parent);
             primaryStage.setScene(scene);
             primaryStage.setResizable(true);
-            primaryStage.setTitle("Serwer działa - port: " + portTF.getText());
+            primaryStage.setTitle("Serwer działa - port: " + serverPortTF.getText());
 
 
             MainController mainController = loader.getController();

@@ -81,21 +81,18 @@
                                     </rowConstraints>
                                     <children>
                                         <Label text="Imię"/>
-                                        <TextField fx:id="nameR" text="Paweł" GridPane.columnIndex="1"/>
+                                        <TextField fx:id="nameR" GridPane.columnIndex="1"/>
                                         <Label text="Nazwisko" GridPane.rowIndex="1"/>
-                                        <TextField fx:id="surnameR" text="Grzegórzko" GridPane.columnIndex="1"
-                                                   GridPane.rowIndex="1"/>
+                                        <TextField fx:id="surnameR" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
                                         <Label text="Mail" GridPane.rowIndex="2"/>
-                                        <TextField fx:id="mailR" text="examplemail" GridPane.columnIndex="1"
-                                                   GridPane.rowIndex="2"/>
+                                        <TextField fx:id="mailR" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
                                         <Label text="Login" GridPane.rowIndex="3"/>
-                                        <TextField fx:id="loginR" text="admin" GridPane.columnIndex="1"
-                                                   GridPane.rowIndex="3"/>
+                                        <TextField fx:id="loginR" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
                                         <Label text="Hasło" GridPane.rowIndex="4"/>
-                                        <PasswordField fx:id="passwordR" text="qwerty" GridPane.columnIndex="1"
+                                        <PasswordField fx:id="passwordR" GridPane.columnIndex="1"
                                                        GridPane.rowIndex="4"/>
                                         <Label text="Powtórz hasło" GridPane.rowIndex="5"/>
-                                        <PasswordField fx:id="password1R" text="qwerty" GridPane.columnIndex="1"
+                                        <PasswordField fx:id="password1R" GridPane.columnIndex="1"
                                                        GridPane.rowIndex="5"/>
                                     </children>
                                 </GridPane>
