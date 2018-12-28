@@ -11,13 +11,11 @@ import javafx.concurrent.Worker;
 import wazxse5.client.task.ConnectTask;
 import wazxse5.client.task.ReceiveTask;
 import wazxse5.common.UserInfo;
+import wazxse5.common.exception.DatabaseException;
 import wazxse5.common.exception.NoConnectionException;
 import wazxse5.common.message.Message;
 import wazxse5.common.message.UserMessage;
-import wazxse5.common.message.config.LoginAnswerMessage;
-import wazxse5.common.message.config.LoginRequestMessage;
-import wazxse5.common.message.config.RegisterRequestMessage;
-import wazxse5.common.message.config.SessionMessage;
+import wazxse5.common.message.config.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +48,7 @@ public class ThreadClient {
     public void sendLoginRequest(String login, byte[] password, boolean guest) {
         if (connection != null) {
             connection.send(new LoginRequestMessage(login, password, guest));
-        } else viewManager.handleLoginError(new NoConnectionException());
+        } else viewManager.handleLoginError(new DatabaseException());
     }
 
     public void sendRegisterRequest(UserInfo userInfo, byte[] password) {
@@ -92,6 +90,11 @@ public class ThreadClient {
                 connection.setUserInfo(loginAnswerMessage.getUserInfo());
                 viewManager.loadMainScene();
             } else viewManager.handleLoginError(loginAnswerMessage.getException());
+        }
+        if (message instanceof RegisterAnswerMessage) {
+            RegisterAnswerMessage registerAnswerMessage = (RegisterAnswerMessage) message;
+            if (registerAnswerMessage.isGood()) viewManager.getInitController().setInfoText("R", "Zarejestrowano");
+            else viewManager.handleRegisterError(registerAnswerMessage.getException());
         }
     }
 

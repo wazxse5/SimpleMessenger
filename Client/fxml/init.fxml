@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <AnchorPane prefHeight="500.0" prefWidth="360.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="wazxse5.client.controller.LoginController">
+            fx:controller="wazxse5.client.controller.InitController">
     <children>
         <TabPane AnchorPane.bottomAnchor="120.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
                  AnchorPane.topAnchor="0.0">

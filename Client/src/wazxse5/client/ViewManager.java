@@ -3,12 +3,9 @@ package wazxse5.client;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import wazxse5.client.controller.LoginController;
+import wazxse5.client.controller.InitController;
 import wazxse5.client.controller.MainController;
-import wazxse5.common.exception.LoginIsNotAvailableException;
-import wazxse5.common.exception.LoginNotExistsException;
-import wazxse5.common.exception.NoConnectionException;
-import wazxse5.common.exception.WrongPasswordException;
+import wazxse5.common.exception.*;
 
 import java.io.IOException;
 
@@ -19,7 +16,7 @@ public class ViewManager {
     private Scene mainScene;
     private Scene loginScene;
     private MainController mainController;
-    private LoginController loginController;
+    private InitController initController;
 
     public ViewManager(Stage stage, ThreadClient threadClient) {
         this.stage = stage;
@@ -45,13 +42,13 @@ public class ViewManager {
     public void loadLoginScene() {
         if (loginScene == null) {
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/login.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/init.fxml"));
                 loginScene = new Scene(loader.load());
-                loginController = loader.getController();
-                loginController.setThreadClient(threadClient);
-                loginController.setViewManager(this);
+                initController = loader.getController();
+                initController.setThreadClient(threadClient);
+                initController.setViewManager(this);
             } catch (IOException e) {
-                System.err.println("Nie można wczytać login.fxml");
+                System.err.println("Nie można wczytać init.fxml");
             }
         }
         stage.setScene(loginScene);
@@ -59,19 +56,24 @@ public class ViewManager {
 
     public void handleLoginError(Throwable throwable) {
         if (throwable instanceof LoginIsNotAvailableException)
-            loginController.setInfoText("L", "Ten login jest zajęty");
+            initController.setInfoText("L", "Ten login jest zajęty");
         else if (throwable instanceof LoginNotExistsException)
-            loginController.setInfoText("L", "Nie ma takiego użytkownika");
-        else if (throwable instanceof WrongPasswordException) loginController.setInfoText("L", "Nieprawidłowe hasło");
-        else loginController.setInfoText("L", "Nie można nawiązać połączenia");
+            initController.setInfoText("L", "Nie ma takiego użytkownika");
+        else if (throwable instanceof WrongPasswordException) initController.setInfoText("L", "Nieprawidłowe hasło");
+        else initController.setInfoText("L", "Nie można nawiązać połączenia");
     }
 
     public void handleConnectError(Throwable throwable) {
-        if (throwable instanceof NoConnectionException)
-            loginController.setInfoText("C", "Nie można nawiązać połączenia");
+        if (throwable instanceof DatabaseException)
+            initController.setInfoText("C", "Nie można nawiązać połączenia");
     }
 
     public void handleRegisterError(Throwable throwable) {
-        if (throwable instanceof NoConnectionException) loginController.setInfoText("R", "Nie połączono");
+        if (throwable instanceof NoConnectionException) initController.setInfoText("R", "Nie połączono");
+        else if (throwable instanceof DatabaseException) initController.setInfoText("R", "Błąd bazy danych");
+    }
+
+    public InitController getInitController() {
+        return initController;
     }
 }

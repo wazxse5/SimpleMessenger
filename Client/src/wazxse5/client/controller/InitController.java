@@ -17,7 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class LoginController {
+public class InitController {
     private ViewManager viewManager;
     private ThreadClient threadClient;
     private StringProperty serverAddress = new SimpleStringProperty();
@@ -92,7 +92,7 @@ public class LoginController {
         if (passwordR.getText().trim().equals(password1R.getText().trim())) {
             byte[] password = hash(passwordR.getText());
             if (password != null) {
-                UserInfo userInfo = new UserInfo(name, surname, mail, login, false);
+                UserInfo userInfo = new UserInfo(-1, name, surname, mail, login, null, -1, false);
                 threadClient.sendRegisterRequest(userInfo, password);
             }
         } else infoR.setText("Wpisane hasła różnią się");

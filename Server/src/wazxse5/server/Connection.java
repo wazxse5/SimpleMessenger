@@ -47,6 +47,10 @@ public class Connection {
         }
     }
 
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     public ObjectInputStream getInputStream() {
         return inputStream;
     }

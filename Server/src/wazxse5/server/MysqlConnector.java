@@ -1,9 +1,12 @@
 package wazxse5.server;
 
 import wazxse5.common.UserInfo;
+import wazxse5.common.exception.*;
 
 import java.sql.Connection;
 import java.sql.*;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 public class MysqlConnector {
     private Connection connection;
@@ -19,24 +22,40 @@ public class MysqlConnector {
         connection = DriverManager.getConnection(dbUrl, dbUserName, dbPassword);
     }
 
-    public String loginUser(String login, byte[] password) throws SQLException {
+    public User loginUser(String userLogin, byte[] password) throws SQLException, AuthenticationException {
         PreparedStatement loginStatement = connection.prepareStatement("CALL login_user(?,?);");
-        loginStatement.setString(1, login);
+        loginStatement.setString(1, userLogin);
         loginStatement.setBytes(2, password);
+
         resultSet = loginStatement.executeQuery();
         resultSet.next();
-        String result = resultSet.getString("result");
-        int attemptCounter = resultSet.getInt("attempt_counter");
-        return attemptCounter + result;
+        String result = resultSet.getString(1);
+
+        if (result.equals("ok")) {
+            int userID = resultSet.getInt("id_user");
+            String userMail = resultSet.getString("mail");
+            String userName = resultSet.getString("name");
+            String userSurname = resultSet.getString("surname");
+            LocalDateTime userRegistrationTime = LocalDateTime.ofInstant(resultSet.getTimestamp("registration_time").toInstant(), ZoneId.systemDefault());
+            UserInfo userInfo = new UserInfo(userID, userName, userSurname, userMail, userLogin, userRegistrationTime, 3, false);
+            return new User(userInfo);
+        } else if (result.equals("no_attempts")) throw new NoPasswordAttemptsException();
+        else if (result.equals("wrong_password")) throw new WrongPasswordException(resultSet.getInt(2));
+        else if (result.equals("no_user")) throw new LoginNotExistsException();
+        return null;
     }
 
-    public boolean isUserNameAvailable(String login) throws SQLException {
-        PreparedStatement checkAvailableStatement = connection.prepareStatement("CALL check_if_user_exists(?);");
-        checkAvailableStatement.setString(1, login);
+    public boolean loginGuest(String userLogin) throws SQLException, LoginIsNotAvailableException {
+        PreparedStatement checkAvailableStatement = connection.prepareStatement("CALL login_guest(?);");
+        checkAvailableStatement.setString(1, userLogin);
+
         resultSet = checkAvailableStatement.executeQuery();
         resultSet.next();
-        int result = resultSet.getInt(1);
-        return result == 0;
+        String result = resultSet.getString(1);
+
+        if (result.equals("ok")) return true;
+        else if (result.equals("login_not_available")) throw new LoginIsNotAvailableException();
+        else return false;
     }
 
     public String registerUser(UserInfo userInfo, byte[] password) throws SQLException {
@@ -50,5 +69,31 @@ public class MysqlConnector {
         resultSet.next();
         return resultSet.getString("result");
     }
+
+//    public List<User> getAllUsers() throws SQLException {
+//        PreparedStatement usersNumberStatement = connection.prepareStatement("CALL get_users_number();");
+//        resultSet = usersNumberStatement.executeQuery();
+//        resultSet.next();
+//        int usersNumber = resultSet.getInt(1);
+//
+//        PreparedStatement allUsersStatement = connection.prepareStatement("CALL get_all_users();");
+//        resultSet = allUsersStatement.executeQuery();
+//
+//        List<User> users = new ArrayList<>(usersNumber);
+//        while (resultSet.next()) {
+//            int userID = resultSet.getInt("id_user");
+//            String userLogin = resultSet.getString("login");
+//            String userMail = resultSet.getString("mail");
+//            String userName = resultSet.getString("name");
+//            String userSurname = resultSet.getString("surname");
+//            Date date = resultSet.getDate("registration_time");
+//            LocalDateTime userRegistrationTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+//            int userPasswordCounter = resultSet.getInt("password_counter");
+//            UserInfo userInfo = new UserInfo(userID, userName, userSurname, userMail, userLogin, userRegistrationTime, userPasswordCounter, false);
+//            User user = new User(userInfo);
+//            users.add(user);
+//        }
+//        return users;
+//    }
 
 }

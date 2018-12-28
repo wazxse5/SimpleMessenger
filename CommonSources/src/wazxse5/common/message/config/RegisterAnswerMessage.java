@@ -1,25 +1,22 @@
 package wazxse5.common.message.config;
 
+import wazxse5.common.exception.AuthenticationException;
+
 public class RegisterAnswerMessage extends ServerMessage {
     private static final long serialVersionUID = 577625073596981704L;
-    private final boolean ok;
-    private final int infoCode;
+    private final boolean good;
+    private final AuthenticationException exception;
 
-    public RegisterAnswerMessage(boolean ok) {
-        this.ok = ok;
-        this.infoCode = 0;
+    public RegisterAnswerMessage(boolean good, AuthenticationException exception) {
+        this.good = good;
+        this.exception = exception;
     }
 
-    public RegisterAnswerMessage(boolean ok, int infoCode) {
-        this.ok = ok;
-        this.infoCode = infoCode;
+    public boolean isGood() {
+        return good;
     }
 
-    public boolean isOk() {
-        return ok;
-    }
-
-    public int getInfoCode() {
-        return infoCode;
+    public AuthenticationException getException() {
+        return exception;
     }
 }

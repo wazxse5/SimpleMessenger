@@ -30,6 +30,7 @@ public class LoginTask extends Task<Void> {
             User user = dataLoader.login(name, password, isGuest);
             user.setConnected(true);
             user.setConnection(connection);
+            connection.setUser(user);
             connection.send(new LoginAnswerMessage(true, null, user.getUserInfo()));
         } catch (AuthenticationException exception) {
             connection.send(new LoginAnswerMessage(false, exception, null));

@@ -13,12 +13,10 @@ public class User {
 
     private List<User> friends;
 
-    public User() {
-
-    }
-
-    public User(UserInfo userInfo, List<User> friends) {
-        this.friends = friends;
+    public User(UserInfo userInfo) {
+        this.userInfo = userInfo;
+        this.connected = false;
+        this.connection = null;
     }
 
     public void send(Message message) {

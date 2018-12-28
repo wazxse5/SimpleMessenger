@@ -4,10 +4,7 @@ import wazxse5.common.message.Message;
 import wazxse5.common.message.config.LoginRequestMessage;
 import wazxse5.common.message.config.RegisterRequestMessage;
 import wazxse5.common.message.config.WelcomeMessage;
-import wazxse5.server.task.AcceptingTask;
-import wazxse5.server.task.LoginTask;
-import wazxse5.server.task.ReceiveTask;
-import wazxse5.server.task.UpdatingConnectedTask;
+import wazxse5.server.task.*;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -65,7 +62,8 @@ public class ThreadServer {
         }
         if (message instanceof RegisterRequestMessage) {
             RegisterRequestMessage registerRequestMessage = (RegisterRequestMessage) message;
-            dataLoader.register(registerRequestMessage.getUserInfo(), registerRequestMessage.getPassword());
+            RegisterTask registerTask = new RegisterTask(dataLoader, connection, registerRequestMessage);
+            executor.submit(registerTask);
         }
         if (message instanceof LoginRequestMessage) {
             LoginRequestMessage loginRequestMessage = (LoginRequestMessage) message;
