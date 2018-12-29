@@ -14,7 +14,7 @@ public class ViewManager {
     private ThreadClient threadClient;
 
     private Scene mainScene;
-    private Scene loginScene;
+    private Scene initScene;
     private MainController mainController;
     private InitController initController;
 
@@ -22,6 +22,21 @@ public class ViewManager {
         this.stage = stage;
         this.threadClient = threadClient;
         this.stage.setOnCloseRequest(event -> threadClient.close());
+    }
+
+    public void loadInitScene() {
+        if (initScene == null) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/init.fxml"));
+                initScene = new Scene(loader.load());
+                initController = loader.getController();
+                initController.setThreadClient(threadClient);
+                initController.setViewManager(this);
+            } catch (IOException e) {
+                System.err.println("Nie można wczytać init.fxml");
+            }
+        }
+        stage.setScene(initScene);
     }
 
     public void loadMainScene() {
@@ -37,21 +52,6 @@ public class ViewManager {
             }
         }
         stage.setScene(mainScene);
-    }
-
-    public void loadLoginScene() {
-        if (loginScene == null) {
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/init.fxml"));
-                loginScene = new Scene(loader.load());
-                initController = loader.getController();
-                initController.setThreadClient(threadClient);
-                initController.setViewManager(this);
-            } catch (IOException e) {
-                System.err.println("Nie można wczytać init.fxml");
-            }
-        }
-        stage.setScene(loginScene);
     }
 
     public void handleLoginError(Throwable throwable) {

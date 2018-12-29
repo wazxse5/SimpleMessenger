@@ -15,7 +15,7 @@ public class Main extends Application {
         ViewManager viewManager = new ViewManager(primaryStage, threadClient);
         threadClient.setViewManager(viewManager);
 
-        viewManager.loadLoginScene();
+        viewManager.loadInitScene();
         primaryStage.show();
     }
 }

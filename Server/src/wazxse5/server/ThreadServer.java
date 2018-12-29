@@ -1,5 +1,7 @@
 package wazxse5.server;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import wazxse5.common.message.Message;
 import wazxse5.common.message.config.LoginRequestMessage;
 import wazxse5.common.message.config.RegisterRequestMessage;
@@ -15,7 +17,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class ThreadServer {
-    private final int port;
+    private ViewManager viewManager;
 
     private final ExecutorService executor;
     private AcceptingTask acceptingTask;
@@ -23,17 +25,16 @@ public class ThreadServer {
     private final List<ReceiveTask> receiveTasks;
 
     private final DataLoader dataLoader;
-    private final List<Connection> connectedConnections;
+    private final ObservableList<Connection> connectedConnections;
 
-    public ThreadServer(int port) {
-        this.port = port;
+    public ThreadServer() {
         this.executor = Executors.newCachedThreadPool();
         this.receiveTasks = new ArrayList<>();
         this.dataLoader = new DataLoader();
-        this.connectedConnections = new ArrayList<>();
+        this.connectedConnections = FXCollections.observableArrayList();
     }
 
-    public void start() {
+    public void start(int port) {
         try {
             ServerSocket serverSocket = new ServerSocket(port);
 
@@ -76,6 +77,14 @@ public class ThreadServer {
         List<User> connectedUsers = new ArrayList<>(connectedConnections.size());
         for (Connection c : connectedConnections) connectedUsers.add(c.getUser());
         return connectedUsers;
+    }
+
+    public ObservableList<Connection> getConnectedConnections() {
+        return connectedConnections;
+    }
+
+    public void setViewManager(ViewManager viewManager) {
+        this.viewManager = viewManager;
     }
 
     public void close() {

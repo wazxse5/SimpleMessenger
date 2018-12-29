@@ -1,11 +1,7 @@
 package wazxse5.server;
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
-import wazxse5.server.controller.InitController;
 
 public class Main extends Application {
 
@@ -15,14 +11,11 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/init.fxml"));
-        Parent root = loader.load();
-        InitController initController = loader.getController();
-        initController.setPrimaryStage(primaryStage);
+        ThreadServer threadServer = new ThreadServer();
+        ViewManager viewManager = new ViewManager(primaryStage, threadServer);
+        threadServer.setViewManager(viewManager);
 
-        primaryStage.setTitle("Server");
-        primaryStage.setScene(new Scene(root));
-        primaryStage.setResizable(false);
+        viewManager.loadInitScene();
         primaryStage.show();
     }
 }

@@ -25,6 +25,10 @@ public class UserInfo implements Serializable {
         this.guest = guest;
     }
 
+    public int getId() {
+        return id;
+    }
+
     public String getName() {
         return name;
     }

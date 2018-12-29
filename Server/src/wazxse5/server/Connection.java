@@ -1,5 +1,6 @@
 package wazxse5.server;
 
+import javafx.beans.property.ObjectProperty;
 import wazxse5.common.message.Message;
 
 import java.io.IOException;
@@ -11,7 +12,7 @@ public class Connection {
     private final Socket socket;
     private ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
-    private User user;
+    private ObjectProperty<User> user;
 
 
     public Connection(Socket socket) {
@@ -34,6 +35,10 @@ public class Connection {
     }
 
     public User getUser() {
+        return user.get();
+    }
+
+    public ObjectProperty<User> userProperty() {
         return user;
     }
 
@@ -48,7 +53,7 @@ public class Connection {
     }
 
     public void setUser(User user) {
-        this.user = user;
+        this.user.setValue(user);
     }
 
     public ObjectInputStream getInputStream() {
