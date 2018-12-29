@@ -117,7 +117,13 @@ public class ThreadClient {
         return connected;
     }
 
+    public void logout() {
+        connection.send(new GoodbyeMessage("logout"));
+        viewManager.loadInitScene();
+    }
+
     public void close() {
+        if (connection != null) connection.send(new GoodbyeMessage("exit"));
         if (executor != null) executor.shutdown();
         if (receiveTask != null) receiveTask.cancel(true);
         if (connection != null) connection.close();

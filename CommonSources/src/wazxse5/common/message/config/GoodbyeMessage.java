@@ -12,7 +12,7 @@ public class GoodbyeMessage extends ServerMessage {
         this("goodbye");
     }
 
-    public String getGoodbye() {
+    public String getMessage() {
         return goodbye;
     }
 }

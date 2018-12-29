@@ -55,4 +55,8 @@ public class ViewManager {
         stage.setResizable(true);
         stage.setScene(mainScene);
     }
+
+    public void refreshConnectedConnectionsTable() {
+        mainController.refreshConnectionsTable();
+    }
 }

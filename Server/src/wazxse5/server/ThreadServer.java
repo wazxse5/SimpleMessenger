@@ -3,6 +3,7 @@ package wazxse5.server;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import wazxse5.common.message.Message;
+import wazxse5.common.message.config.GoodbyeMessage;
 import wazxse5.common.message.config.LoginRequestMessage;
 import wazxse5.common.message.config.RegisterRequestMessage;
 import wazxse5.common.message.config.WelcomeMessage;
@@ -50,6 +51,7 @@ public class ThreadServer {
     }
 
     private void handleNewConnection(Connection connection) {
+        connection.setViewManager(viewManager);
         connectedConnections.add(connection);
         ReceiveTask receiveTask = new ReceiveTask(connection.getInputStream());
         receiveTask.valueProperty().addListener((observable, oldValue, newValue) -> handleReceivedMessage(connection, newValue));
@@ -70,6 +72,11 @@ public class ThreadServer {
             LoginRequestMessage loginRequestMessage = (LoginRequestMessage) message;
             LoginTask loginTask = new LoginTask(dataLoader, connection, loginRequestMessage);
             executor.submit(loginTask);
+        }
+        if (message instanceof GoodbyeMessage) {
+            GoodbyeMessage goodbyeMessage = (GoodbyeMessage) message;
+            if (goodbyeMessage.getMessage().equals("logout")) connection.setUser(User.createEmptyUser());
+            else connectedConnections.remove(connection);
         }
     }
 

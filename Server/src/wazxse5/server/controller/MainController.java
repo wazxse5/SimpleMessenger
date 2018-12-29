@@ -1,8 +1,10 @@
 package wazxse5.server.controller;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import wazxse5.server.Connection;
 import wazxse5.server.ThreadServer;
 import wazxse5.server.ViewManager;
@@ -12,8 +14,8 @@ public class MainController {
     private ViewManager viewManager;
 
     @FXML private TableView<Connection> connectionsTable;
-    @FXML private TableColumn<Connection, Integer> IDpColumn;
-    @FXML private TableColumn<Connection, Integer> IDuColumn;
+    @FXML private TableColumn<Connection, String> IDpColumn;
+    @FXML private TableColumn<Connection, String> IDuColumn;
     @FXML private TableColumn<Connection, String> loginColumn;
 
 
@@ -24,9 +26,13 @@ public class MainController {
     public void setThreadServer(ThreadServer threadServer) {
         this.threadServer = threadServer;
         connectionsTable.setItems(threadServer.getConnectedConnections());
-        // FIXME: 28.12.2018 
-//        loginColumn.setCellValueFactory(param -> param.getValue().userProperty().get().getUserInfo().getLogin());
-//        IDuColumn.setCellValueFactory(param -> new ReadOnlyObjectWrapper(param.getValue().getUser().getUserInfo().getId()));
+        IDpColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        IDuColumn.setCellValueFactory(param -> param.getValue().getUser().idProperty());
+        loginColumn.setCellValueFactory(param -> param.getValue().getUser().loginProperty());
+    }
+
+    public void refreshConnectionsTable() {
+        Platform.runLater(() -> connectionsTable.refresh());
     }
 
     public void setViewManager(ViewManager viewManager) {

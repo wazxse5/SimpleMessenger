@@ -1,5 +1,6 @@
 package wazxse5.client.controller;
 
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
@@ -26,6 +27,15 @@ public class MainController {
     public void sendMessage() {
         threadClient.send(selectedFriend.get(), inputTF.getText());
         inputTF.setText("");
+    }
+
+    public void logout() {
+        threadClient.logout();
+    }
+
+    public void exit() {
+        threadClient.close();
+        Platform.exit();
     }
 
     public void handleReceivedMessage(String from, String message) {
