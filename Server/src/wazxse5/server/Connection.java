@@ -1,9 +1,6 @@
 package wazxse5.server;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import wazxse5.common.message.Message;
 
 import java.io.IOException;
@@ -15,9 +12,12 @@ public class Connection {
     private ViewManager viewManager;
     private static int idCounter = 0;
     private StringProperty id = new SimpleStringProperty();
+
     private final Socket socket;
     private ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
+
+    private BooleanProperty logged = new SimpleBooleanProperty(false);
     private ObjectProperty<User> user = new SimpleObjectProperty<>();
 
 
@@ -79,5 +79,13 @@ public class Connection {
 
     public StringProperty idProperty() {
         return id;
+    }
+
+    public void setLogged(boolean logged) {
+        this.logged.set(logged);
+    }
+
+    public boolean isLogged() {
+        return logged.get();
     }
 }

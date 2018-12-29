@@ -27,12 +27,14 @@ public class ThreadServer {
 
     private final DataLoader dataLoader;
     private final ObservableList<Connection> connectedConnections;
+    private final ObservableList<String> loggedUsersNames;
 
     public ThreadServer() {
         this.executor = Executors.newCachedThreadPool();
         this.receiveTasks = new ArrayList<>();
         this.dataLoader = new DataLoader();
         this.connectedConnections = FXCollections.observableArrayList();
+        this.loggedUsersNames = FXCollections.observableArrayList();
     }
 
     public void start(int port) {
@@ -43,7 +45,7 @@ public class ThreadServer {
             acceptingTask.valueProperty().addListener((observable, oldValue, newValue) -> handleNewConnection(newValue));
             executor.submit(acceptingTask);
 
-            UpdatingConnectedTask updatingConnectedTask = new UpdatingConnectedTask(this);
+            UpdatingConnectedTask updatingConnectedTask = new UpdatingConnectedTask(connectedConnections, loggedUsersNames);
             this.updatingConnectedTask = executor.submit(updatingConnectedTask);
         } catch (IOException e) {
             e.printStackTrace();
@@ -71,12 +73,19 @@ public class ThreadServer {
         if (message instanceof LoginRequestMessage) {
             LoginRequestMessage loginRequestMessage = (LoginRequestMessage) message;
             LoginTask loginTask = new LoginTask(dataLoader, connection, loginRequestMessage);
+            loginTask.messageProperty().addListener((observable, oldValue, newValue) -> loggedUsersNames.add(newValue));
             executor.submit(loginTask);
         }
         if (message instanceof GoodbyeMessage) {
             GoodbyeMessage goodbyeMessage = (GoodbyeMessage) message;
-            if (goodbyeMessage.getMessage().equals("logout")) connection.setUser(User.createEmptyUser());
-            else connectedConnections.remove(connection);
+            if (goodbyeMessage.getMessage().equals("logout")) {
+                loggedUsersNames.remove(connection.getUser().getLogin());
+                connection.setUser(User.createEmptyUser());
+                connection.setLogged(false);
+            } else {
+                loggedUsersNames.remove(connection.getUser().getLogin());
+                connectedConnections.remove(connection);
+            }
         }
     }
 

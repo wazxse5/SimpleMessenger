@@ -30,12 +30,12 @@ public class ThreadClient {
 
     private BooleanProperty connected = new SimpleBooleanProperty();
     private ListProperty<String> connectedFriendsProperty = new SimpleListProperty<>();
-    private ObservableList<String> connectedFriendsList = FXCollections.observableList(new ArrayList<>());
+    private ObservableList<String> loggedUserNamesList = FXCollections.observableList(new ArrayList<>());
 
 
     public ThreadClient() {
         executor = Executors.newSingleThreadExecutor();
-        connectedFriendsProperty.setValue(connectedFriendsList);
+        connectedFriendsProperty.setValue(loggedUserNamesList);
     }
 
     public void connect(String address, int port) {
@@ -82,7 +82,7 @@ public class ThreadClient {
         }
         if (message instanceof SessionMessage) {
             SessionMessage sessionMessage = (SessionMessage) message;
-            updateConnectedFriends(sessionMessage.getConncectedClientsNames());
+            updateLoggedUserNames(sessionMessage.getLoggedUserNames());
         }
         if (message instanceof LoginAnswerMessage) {
             LoginAnswerMessage loginAnswerMessage = (LoginAnswerMessage) message;
@@ -98,14 +98,15 @@ public class ThreadClient {
         }
     }
 
-    private void updateConnectedFriends(List<String> currentlyConnectedFriends) {
+    private void updateLoggedUserNames(List<String> loggedUserNames) {
         Platform.runLater(() -> {
-            for (String friend : currentlyConnectedFriends) {
-                if (!connectedFriendsList.contains(friend)) connectedFriendsList.add(friend);
+            for (String friend : loggedUserNames) {
+                if (!loggedUserNamesList.contains(friend)) loggedUserNamesList.add(friend);
             }
-            for (String friend : connectedFriendsList) {
-                if (!currentlyConnectedFriends.contains(friend)) connectedFriendsList.remove(friend);
+            for (String friend : loggedUserNamesList) {
+                if (!loggedUserNames.contains(friend)) loggedUserNamesList.remove(friend);
             }
+            loggedUserNamesList.remove(connection.getUserInfo().getLogin());
         });
     }
 

@@ -21,7 +21,6 @@ public class LoginTask extends Task<Void> {
         this.loginRequestMessage = loginRequestMessage;
     }
 
-
     @Override protected Void call() {
         String name = loginRequestMessage.getLogin();
         byte[] password = loginRequestMessage.getPassword();
@@ -31,9 +30,11 @@ public class LoginTask extends Task<Void> {
             user.setConnected(true);
             user.setConnection(connection);
             connection.setUser(user);
-            connection.send(new LoginAnswerMessage(true, null, user.getUserInfo()));
+            connection.setLogged(true);
+            connection.send(new LoginAnswerMessage(true, null, user.getUserInfo(), null));
+            updateMessage(user.getLogin());
         } catch (AuthenticationException exception) {
-            connection.send(new LoginAnswerMessage(false, exception, null));
+            connection.send(new LoginAnswerMessage(false, exception));
         } catch (SQLException ignored) {
         }
         return null;
