@@ -55,7 +55,7 @@ public class ThreadServer {
     private void handleNewConnection(Connection connection) {
         connection.setViewManager(viewManager);
         connectedConnections.add(connection);
-        ReceiveTask receiveTask = new ReceiveTask(connection.getInputStream());
+        ReceiveTask receiveTask = new ReceiveTask(connectedConnections, connection.getInputStream());
         receiveTask.valueProperty().addListener((observable, oldValue, newValue) -> handleReceivedMessage(connection, newValue));
         receiveTasks.add(receiveTask);
         executor.submit(receiveTask);
@@ -87,12 +87,6 @@ public class ThreadServer {
                 connectedConnections.remove(connection);
             }
         }
-    }
-
-    public List<User> getConnectedUsers() {
-        List<User> connectedUsers = new ArrayList<>(connectedConnections.size());
-        for (Connection c : connectedConnections) connectedUsers.add(c.getUser());
-        return connectedUsers;
     }
 
     public ObservableList<Connection> getConnectedConnections() {

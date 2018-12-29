@@ -70,30 +70,4 @@ public class MysqlConnector {
         return resultSet.getString("result");
     }
 
-//    public List<User> getAllUsers() throws SQLException {
-//        PreparedStatement usersNumberStatement = connection.prepareStatement("CALL get_users_number();");
-//        resultSet = usersNumberStatement.executeQuery();
-//        resultSet.next();
-//        int usersNumber = resultSet.getInt(1);
-//
-//        PreparedStatement allUsersStatement = connection.prepareStatement("CALL get_all_users();");
-//        resultSet = allUsersStatement.executeQuery();
-//
-//        List<User> users = new ArrayList<>(usersNumber);
-//        while (resultSet.next()) {
-//            int userID = resultSet.getInt("id_user");
-//            String userLogin = resultSet.getString("login");
-//            String userMail = resultSet.getString("mail");
-//            String userName = resultSet.getString("name");
-//            String userSurname = resultSet.getString("surname");
-//            Date date = resultSet.getDate("registration_time");
-//            LocalDateTime userRegistrationTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-//            int userPasswordCounter = resultSet.getInt("password_counter");
-//            UserInfo userInfo = new UserInfo(userID, userName, userSurname, userMail, userLogin, userRegistrationTime, userPasswordCounter, false);
-//            User user = new User(userInfo);
-//            users.add(user);
-//        }
-//        return users;
-//    }
-
 }

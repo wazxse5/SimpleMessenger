@@ -96,6 +96,10 @@ public class ThreadClient {
             if (registerAnswerMessage.isGood()) viewManager.getInitController().setInfoText("R", "Zarejestrowano");
             else viewManager.handleRegisterError(registerAnswerMessage.getException());
         }
+        if (message instanceof UserMessage) {
+            UserMessage userMessage = (UserMessage) message;
+            System.out.println(userMessage.getFrom() + ": " + userMessage.getMessage());
+        }
     }
 
     private void updateLoggedUserNames(List<String> loggedUserNames) {
