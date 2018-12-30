@@ -48,4 +48,8 @@ public class UserInfo implements Serializable {
     public boolean isGuest() {
         return guest;
     }
+
+    public String getSimpleInfo() {
+        return login + " - " + name + " " + surname;
+    }
 }

@@ -26,6 +26,11 @@ public class MainController {
 
     }
 
+    public void exit() {
+        threadServer.close();
+        Platform.exit();
+    }
+
     public void setThreadServer(ThreadServer threadServer) {
         this.threadServer = threadServer;
 

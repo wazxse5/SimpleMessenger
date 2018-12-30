@@ -8,6 +8,7 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Worker;
+import javafx.scene.control.Alert;
 import wazxse5.client.task.ConnectTask;
 import wazxse5.client.task.ReceiveTask;
 import wazxse5.common.UserInfo;
@@ -88,13 +89,23 @@ public class ThreadClient {
             LoginAnswerMessage loginAnswerMessage = (LoginAnswerMessage) message;
             if (loginAnswerMessage.isGood()) {
                 connection.setUserInfo(loginAnswerMessage.getUserInfo());
-                viewManager.loadMainScene();
+                viewManager.loadMainScene(loginAnswerMessage.getUserInfo().getSimpleInfo());
             } else viewManager.handleLoginError(loginAnswerMessage.getException());
         }
         if (message instanceof RegisterAnswerMessage) {
             RegisterAnswerMessage registerAnswerMessage = (RegisterAnswerMessage) message;
             if (registerAnswerMessage.isGood()) viewManager.getInitController().setInfoText("R", "Zarejestrowano");
             else viewManager.handleRegisterError(registerAnswerMessage.getException());
+        }
+        if (message instanceof GoodbyeMessage) {
+            GoodbyeMessage goodbyeMessage = (GoodbyeMessage) message;
+            if (goodbyeMessage.getMessage().equals("exit")) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Ostrzeżenie");
+                alert.setHeaderText(null);
+                alert.setContentText("Serwer rozłączył się");
+                alert.showAndWait();
+            }
         }
         if (message instanceof UserMessage) {
             UserMessage userMessage = (UserMessage) message;

@@ -55,7 +55,7 @@
         <HBox alignment="CENTER_LEFT" prefHeight="30.0" spacing="10.0" AnchorPane.bottomAnchor="10.0"
               AnchorPane.leftAnchor="10.0">
             <children>
-                <Button mnemonicParsing="false" prefHeight="30.0" text="Wyjście">
+                <Button fx:id="exit" mnemonicParsing="false" prefHeight="30.0" text="Wyjście">
                     <font>
                         <Font size="14.0"/>
                     </font>

@@ -38,9 +38,10 @@ public class ViewManager {
             }
         }
         stage.setScene(initScene);
+        stage.setTitle("Simple Messenger by wazxse5");
     }
 
-    public void loadMainScene() {
+    public void loadMainScene(String stageTitle) {
         if (mainScene == null) {
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/main.fxml"));
@@ -53,6 +54,7 @@ public class ViewManager {
             }
         }
         stage.setScene(mainScene);
+        stage.setTitle(stageTitle);
     }
 
     public void handleLoginError(Throwable throwable) {

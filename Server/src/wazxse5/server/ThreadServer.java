@@ -101,7 +101,7 @@ public class ThreadServer {
     }
 
     public void close() {
-        executor.shutdown();
+        if (executor != null) executor.shutdown();
         if (acceptingTask != null) acceptingTask.cancel(true);
         if (updatingConnectedTask != null) updatingConnectedTask.cancel(true);
         for (ReceiveTask receiveTask : receiveTasks) receiveTask.cancel(true);
