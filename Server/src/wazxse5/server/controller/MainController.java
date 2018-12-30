@@ -17,6 +17,9 @@ public class MainController {
     @FXML private TableColumn<Connection, String> IDpColumn;
     @FXML private TableColumn<Connection, String> IDuColumn;
     @FXML private TableColumn<Connection, String> loginColumn;
+    @FXML private TableColumn<Connection, String> nameColumn;
+    @FXML private TableColumn<Connection, String> surnameColumn;
+    @FXML private TableColumn<Connection, String> mailColumn;
 
 
     public void initialize() {
@@ -25,10 +28,14 @@ public class MainController {
 
     public void setThreadServer(ThreadServer threadServer) {
         this.threadServer = threadServer;
+
         connectionsTable.setItems(threadServer.getConnectedConnections());
         IDpColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         IDuColumn.setCellValueFactory(param -> param.getValue().getUser().idProperty());
         loginColumn.setCellValueFactory(param -> param.getValue().getUser().loginProperty());
+        nameColumn.setCellValueFactory(param -> param.getValue().getUser().nameProperty());
+        surnameColumn.setCellValueFactory(param -> param.getValue().getUser().surnameProperty());
+        mailColumn.setCellValueFactory(param -> param.getValue().getUser().mailProperty());
     }
 
     public void refreshConnectionsTable() {

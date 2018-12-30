@@ -17,32 +17,35 @@
             <columns>
                 <TableColumn fx:id="IDpColumn" minWidth="40.0" prefWidth="100.0" text="ID połączenia"/>
                 <TableColumn fx:id="IDuColumn" minWidth="40.0" prefWidth="100.0" text="ID użytkownika"/>
-                <TableColumn fx:id="loginColumn" minWidth="40.0" prefWidth="200.0" text="Login"/>
+                <TableColumn fx:id="loginColumn" minWidth="40.0" prefWidth="100.0" text="Login"/>
+                <TableColumn fx:id="nameColumn" minWidth="40.0" prefWidth="100.0" text="Imię"/>
+                <TableColumn fx:id="surnameColumn" minWidth="40.0" prefWidth="100.0" text="Nazwisko"/>
+                <TableColumn fx:id="mailColumn" minWidth="40.0" prefWidth="100.0" text="mail"/>
             </columns>
         </TableView>
         <HBox layoutX="190.0" layoutY="40.0" spacing="10.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="10.0">
             <children>
-                <Button mnemonicParsing="false" prefHeight="30.0" text="Usuń z bazy">
+                <Button mnemonicParsing="false" prefHeight="30.0" text="Usuń z bazy" visible="false">
                     <font>
                         <Font size="14.0"/>
                     </font>
                 </Button>
-                <Button mnemonicParsing="false" prefHeight="30.0" text="Zablokuj">
+                <Button mnemonicParsing="false" prefHeight="30.0" text="Zablokuj" visible="false">
                     <font>
                         <Font size="14.0"/>
                     </font>
                 </Button>
-                <Button mnemonicParsing="false" prefHeight="30.0" text="Rozłącz">
+                <Button mnemonicParsing="false" prefHeight="30.0" text="Rozłącz" visible="false">
                     <font>
                         <Font size="14.0"/>
                     </font>
                 </Button>
-                <Button mnemonicParsing="false" prefHeight="30.0" text="Wyloguj">
+                <Button mnemonicParsing="false" prefHeight="30.0" text="Wyloguj" visible="false">
                     <font>
                         <Font size="14.0"/>
                     </font>
                 </Button>
-                <Button mnemonicParsing="false" prefHeight="30.0" text="Wstrzymaj">
+                <Button mnemonicParsing="false" prefHeight="30.0" text="Wstrzymaj" visible="false">
                     <font>
                         <Font size="14.0"/>
                     </font>
@@ -57,12 +60,13 @@
                         <Font size="14.0"/>
                     </font>
                 </Button>
-                <Button mnemonicParsing="false" prefHeight="30.0" text="Rozłącz wszystkie">
+                <Button mnemonicParsing="false" prefHeight="30.0" text="Rozłącz wszystkie" visible="false">
                     <font>
                         <Font size="14.0"/>
                     </font>
                 </Button>
-                <Button layoutX="82.0" layoutY="10.0" mnemonicParsing="false" prefHeight="30.0" text="Zablokuj nowe">
+                <Button layoutX="82.0" layoutY="10.0" mnemonicParsing="false" prefHeight="30.0" text="Zablokuj nowe"
+                        visible="false">
                     <font>
                         <Font size="14.0"/>
                     </font>

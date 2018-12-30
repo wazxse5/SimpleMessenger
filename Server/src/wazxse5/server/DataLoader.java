@@ -16,8 +16,9 @@ public class DataLoader {
         try {
             mysqlConnector = new MysqlConnector();
             mysqlConnector.connect("localhost", "messenger", "root", "");
-        } catch (Exception ignored) {
-        } // TODO: 17.12.2018 Dopisać obsługę błędu połączenia z bazą
+        } catch (SQLException | ClassNotFoundException e) {
+            System.err.println("Nie można połączyć się z bazą danych");
+        }
     }
 
     public synchronized boolean register(UserInfo userInfo, byte[] password) throws SQLException, LoginIsNotAvailableException {
