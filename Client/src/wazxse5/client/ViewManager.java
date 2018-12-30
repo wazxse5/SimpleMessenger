@@ -6,6 +6,7 @@ import javafx.stage.Stage;
 import wazxse5.client.controller.InitController;
 import wazxse5.client.controller.MainController;
 import wazxse5.common.exception.*;
+import wazxse5.common.message.UserMessage;
 
 import java.io.IOException;
 
@@ -71,6 +72,10 @@ public class ViewManager {
     public void handleRegisterError(Throwable throwable) {
         if (throwable instanceof NoConnectionException) initController.setInfoText("R", "Nie połączono");
         else if (throwable instanceof DatabaseException) initController.setInfoText("R", "Błąd bazy danych");
+    }
+
+    public void handleReceivedUserMessage(UserMessage userMessage) {
+        mainController.handleReceivedMessage(userMessage.getFrom(), userMessage.getMessage());
     }
 
     public InitController getInitController() {

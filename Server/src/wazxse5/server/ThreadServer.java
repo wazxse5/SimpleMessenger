@@ -3,6 +3,7 @@ package wazxse5.server;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import wazxse5.common.message.Message;
+import wazxse5.common.message.UserMessage;
 import wazxse5.common.message.config.GoodbyeMessage;
 import wazxse5.common.message.config.LoginRequestMessage;
 import wazxse5.common.message.config.RegisterRequestMessage;
@@ -28,6 +29,7 @@ public class ThreadServer {
     private final DataLoader dataLoader;
     private final ObservableList<Connection> connectedConnections;
     private final ObservableList<String> loggedUsersNames;
+    private final List<UserMessage> sentUserMessages;
 
     public ThreadServer() {
         this.executor = Executors.newCachedThreadPool();
@@ -35,6 +37,7 @@ public class ThreadServer {
         this.dataLoader = new DataLoader();
         this.connectedConnections = FXCollections.observableArrayList();
         this.loggedUsersNames = FXCollections.observableArrayList();
+        this.sentUserMessages = new ArrayList<>();
     }
 
     public void start(int port) {

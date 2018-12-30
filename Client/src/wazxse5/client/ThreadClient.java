@@ -98,7 +98,7 @@ public class ThreadClient {
         }
         if (message instanceof UserMessage) {
             UserMessage userMessage = (UserMessage) message;
-            System.out.println(userMessage.getFrom() + ": " + userMessage.getMessage());
+            viewManager.handleReceivedUserMessage(userMessage);
         }
     }
 

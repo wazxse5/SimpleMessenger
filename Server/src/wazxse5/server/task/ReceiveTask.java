@@ -26,8 +26,14 @@ public class ReceiveTask extends Task<Message> {
                 updateValue(serverMessage);
             } else if (receiveObject instanceof UserMessage) {
                 UserMessage userMessage = (UserMessage) receiveObject;
-                Connection connection = findAddressee(userMessage.getTo());
-                if (connection != null) connection.send(userMessage);
+                if (userMessage.getTo().equals("-%&-all")) {
+                    for (Connection connection : connectedConnections)
+                        if (!connection.getUser().getLogin().equals(userMessage.getFrom()))
+                            connection.send(userMessage);
+                } else {
+                    Connection connection = findAddressee(userMessage.getTo());
+                    if (connection != null) connection.send(userMessage);
+                }
             }
         }
         return null;
