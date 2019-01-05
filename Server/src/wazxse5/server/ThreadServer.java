@@ -25,6 +25,7 @@ public class ThreadServer {
     private AcceptingTask acceptingTask;
     private Future updatingConnectedTask;
     private final List<ReceiveTask> receiveTasks;
+    private MessageSender messageSender;
 
     private final DataLoader dataLoader;
     private final ObservableList<Connection> connectedConnections;
@@ -34,6 +35,7 @@ public class ThreadServer {
     public ThreadServer() {
         this.executor = Executors.newCachedThreadPool();
         this.receiveTasks = new ArrayList<>();
+        this.messageSender = new MessageSender();
         this.dataLoader = new DataLoader();
         this.connectedConnections = FXCollections.observableArrayList();
         this.loggedUsersNames = FXCollections.observableArrayList();
@@ -58,7 +60,7 @@ public class ThreadServer {
     private void handleNewConnection(Connection connection) {
         connection.setViewManager(viewManager);
         connectedConnections.add(connection);
-        ReceiveTask receiveTask = new ReceiveTask(connectedConnections, connection.getInputStream());
+        ReceiveTask receiveTask = new ReceiveTask(connectedConnections, connection.getInputStream(), messageSender);
         receiveTask.valueProperty().addListener((observable, oldValue, newValue) -> handleReceivedMessage(connection, newValue));
         receiveTasks.add(receiveTask);
         executor.submit(receiveTask);
@@ -101,6 +103,7 @@ public class ThreadServer {
     }
 
     public void close() {
+        if (messageSender != null) messageSender.finish();
         if (executor != null) executor.shutdown();
         if (acceptingTask != null) acceptingTask.cancel(true);
         if (updatingConnectedTask != null) updatingConnectedTask.cancel(true);

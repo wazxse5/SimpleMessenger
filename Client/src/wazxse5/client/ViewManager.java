@@ -2,11 +2,13 @@ package wazxse5.client;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import wazxse5.client.controller.InitController;
 import wazxse5.client.controller.MainController;
 import wazxse5.common.exception.*;
 import wazxse5.common.message.UserMessage;
+import wazxse5.common.message.config.GoodbyeMessage;
 
 import java.io.IOException;
 
@@ -22,6 +24,8 @@ public class ViewManager {
     public ViewManager(Stage stage, ThreadClient threadClient) {
         this.stage = stage;
         this.threadClient = threadClient;
+        this.stage.setMinWidth(400);
+        this.stage.setMinHeight(300);
         this.stage.setOnCloseRequest(event -> threadClient.close());
     }
 
@@ -78,6 +82,16 @@ public class ViewManager {
 
     public void handleReceivedUserMessage(UserMessage userMessage) {
         mainController.handleReceivedMessage(userMessage.getFrom(), userMessage.getMessage());
+    }
+
+    public void handleReceivedGoodbyeMessage(GoodbyeMessage goodbyeMessage) {
+        if (goodbyeMessage.getMessage().equals("exit")) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Ostrzeżenie");
+            alert.setHeaderText(null);
+            alert.setContentText("Serwer rozłączył się");
+            alert.showAndWait();
+        }
     }
 
     public InitController getInitController() {

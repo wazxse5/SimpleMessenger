@@ -1,8 +1,6 @@
 package wazxse5.client.controller;
 
 import javafx.application.Platform;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
@@ -15,7 +13,6 @@ import wazxse5.client.ViewManager;
 public class MainController {
     private ViewManager viewManager;
     private ThreadClient threadClient;
-    private StringProperty selectedUser = new SimpleStringProperty();
 
     @FXML private ListView<String> connectedClientsList;
     @FXML private TextField inputTF;
@@ -25,13 +22,15 @@ public class MainController {
     private int messageCounter = 0;
 
     public void initialize() {
-        selectedUser.bind(connectedClientsList.getSelectionModel().selectedItemProperty());
         outputGP.prefWidthProperty().bind(scrollPane.widthProperty().subtract(10));
     }
 
 
     public void sendMessage() {
-        threadClient.send("-%&-all", inputTF.getText());
+        String addressee = connectedClientsList.getSelectionModel().getSelectedItem();
+        if (addressee.equals("Publiczne")) addressee = "-%&-all";
+        threadClient.sendUserMessage(addressee, inputTF.getText());
+
         MessageContainer messageContainer = new MessageContainer(inputTF.getText());
         outputGP.addRow(messageCounter++, messageContainer);
         GridPane.setColumnIndex(messageContainer, 1);
@@ -65,6 +64,8 @@ public class MainController {
     public void setThreadClient(ThreadClient threadClient) {
         this.threadClient = threadClient;
         connectedClientsList.itemsProperty().bind(threadClient.connectedFriendsProperty());
+        connectedClientsList.itemsProperty().get().add(0, "Publiczne");
+        connectedClientsList.getSelectionModel().selectFirst();
     }
 
     public void setViewManager(ViewManager viewManager) {

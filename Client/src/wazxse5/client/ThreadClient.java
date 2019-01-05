@@ -8,7 +8,6 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Worker;
-import javafx.scene.control.Alert;
 import wazxse5.client.task.ConnectTask;
 import wazxse5.client.task.ReceiveTask;
 import wazxse5.common.UserInfo;
@@ -28,6 +27,7 @@ public class ThreadClient {
     private Connection connection;
     private ExecutorService executor;
     private ReceiveTask receiveTask;
+    private MessageSender messageSender;
 
     private BooleanProperty connected = new SimpleBooleanProperty();
     private ListProperty<String> connectedFriendsProperty = new SimpleListProperty<>();
@@ -35,52 +35,31 @@ public class ThreadClient {
 
 
     public ThreadClient() {
-        executor = Executors.newSingleThreadExecutor();
-        connectedFriendsProperty.setValue(loggedUserNamesList);
+        this.executor = Executors.newSingleThreadExecutor();
+        this.connectedFriendsProperty.setValue(loggedUserNamesList);
+        this.messageSender = new MessageSender();
     }
 
     public void connect(String address, int port) {
         ConnectTask connectTask = new ConnectTask(address, port);
         connectTask.setOnSucceeded(event -> handleConnectionSucceed(event.getSource()));
-        connectTask.setOnFailed(event -> handleConnectionFailed(event.getSource()));
+        connectTask.setOnFailed(event -> viewManager.handleConnectError(event.getSource().getException()));
         executor.execute(connectTask);
-    }
-
-    public void sendLoginRequest(String login, byte[] password, boolean guest) {
-        if (connection != null) {
-            connection.send(new LoginRequestMessage(login, password, guest));
-        } else viewManager.handleLoginError(new DatabaseException());
-    }
-
-    public void sendRegisterRequest(UserInfo userInfo, byte[] password) {
-        if (connection != null) {
-            connection.send(new RegisterRequestMessage(userInfo, password));
-        } else viewManager.handleRegisterError(new NoConnectionException());
     }
 
     private void handleConnectionSucceed(Worker workerConnectTask) {
         Object objectConnection = workerConnectTask.getValue();
         if (objectConnection != null) {
             connection = (Connection) objectConnection;
+            messageSender.setConnection(connection);
             connected.setValue(true);
-            receiveTask = new ReceiveTask(connection.getInput());
+            receiveTask = new ReceiveTask(connection.getInput(), messageSender);
             receiveTask.valueProperty().addListener((observable, oldValue, newValue) -> handleReceivedMessage(newValue));
             executor.execute(receiveTask);
         }
     }
 
-    private void handleConnectionFailed(Worker workerConnectTask) {
-        viewManager.handleConnectError(workerConnectTask.getException());
-    }
-
-    public void send(String to, String message) {
-        connection.send(new UserMessage(connection.getUserInfo().getLogin(), to, message));
-    }
-
     private void handleReceivedMessage(Message message) {
-        if (message instanceof UserMessage) {
-            UserMessage userMessage = (UserMessage) message;
-        }
         if (message instanceof SessionMessage) {
             SessionMessage sessionMessage = (SessionMessage) message;
             updateLoggedUserNames(sessionMessage.getLoggedUserNames());
@@ -99,13 +78,7 @@ public class ThreadClient {
         }
         if (message instanceof GoodbyeMessage) {
             GoodbyeMessage goodbyeMessage = (GoodbyeMessage) message;
-            if (goodbyeMessage.getMessage().equals("exit")) {
-                Alert alert = new Alert(Alert.AlertType.WARNING);
-                alert.setTitle("Ostrzeżenie");
-                alert.setHeaderText(null);
-                alert.setContentText("Serwer rozłączył się");
-                alert.showAndWait();
-            }
+            viewManager.handleReceivedGoodbyeMessage(goodbyeMessage);
         }
         if (message instanceof UserMessage) {
             UserMessage userMessage = (UserMessage) message;
@@ -113,24 +86,20 @@ public class ThreadClient {
         }
     }
 
-    private void updateLoggedUserNames(List<String> loggedUserNames) {
-        Platform.runLater(() -> {
-            for (String friend : loggedUserNames) {
-                if (!loggedUserNamesList.contains(friend)) loggedUserNamesList.add(friend);
-            }
-            for (String friend : loggedUserNamesList) {
-                if (!loggedUserNames.contains(friend)) loggedUserNamesList.remove(friend);
-            }
-            loggedUserNamesList.remove(connection.getUserInfo().getLogin());
-        });
+    public void sendLoginRequest(String login, byte[] password, boolean guest) {
+        if (connection != null) {
+            connection.send(new LoginRequestMessage(login, password, guest));
+        } else viewManager.handleLoginError(new DatabaseException());
     }
 
-    public ListProperty<String> connectedFriendsProperty() {
-        return connectedFriendsProperty;
+    public void sendRegisterRequest(UserInfo userInfo, byte[] password) {
+        if (connection != null) {
+            connection.send(new RegisterRequestMessage(userInfo, password));
+        } else viewManager.handleRegisterError(new NoConnectionException());
     }
 
-    public BooleanProperty connectedProperty() {
-        return connected;
+    public void sendUserMessage(String to, String message) {
+        messageSender.addMessageToSend(new UserMessage(connection.getUserInfo().getLogin(), to, message));
     }
 
     public void logout() {
@@ -139,13 +108,35 @@ public class ThreadClient {
     }
 
     public void close() {
+        if (messageSender != null) messageSender.finish(); // TODO: Zapisanie niedostarczonych wiadomości do pliku
         if (connection != null) connection.send(new GoodbyeMessage("exit"));
         if (executor != null) executor.shutdown();
         if (receiveTask != null) receiveTask.cancel(true);
         if (connection != null) connection.close();
     }
 
+    private void updateLoggedUserNames(List<String> loggedUserNames) {
+        Platform.runLater(() -> {
+            for (String friend : loggedUserNames) {
+                if (!loggedUserNamesList.contains(friend)) loggedUserNamesList.add(friend);
+            }
+            for (String friend : loggedUserNamesList) {
+                if (!loggedUserNames.contains(friend) && !friend.equals("Publiczne"))
+                    loggedUserNamesList.remove(friend);
+            }
+            loggedUserNamesList.remove(connection.getUserInfo().getLogin());
+        });
+    }
+
     public void setViewManager(ViewManager viewManager) {
         this.viewManager = viewManager;
+    }
+
+    public ListProperty<String> connectedFriendsProperty() {
+        return connectedFriendsProperty;
+    }
+
+    public BooleanProperty connectedProperty() {
+        return connected;
     }
 }
