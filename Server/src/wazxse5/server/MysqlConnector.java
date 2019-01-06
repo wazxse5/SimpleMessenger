@@ -45,17 +45,17 @@ public class MysqlConnector {
         return null;
     }
 
-    public boolean loginGuest(String userLogin) throws SQLException, LoginIsNotAvailableException {
-        PreparedStatement checkAvailableStatement = connection.prepareStatement("CALL login_guest(?);");
-        checkAvailableStatement.setString(1, userLogin);
+    public User loginGuest(String userLogin) throws SQLException, LoginIsNotAvailableException {
+        PreparedStatement loginStatement = connection.prepareStatement("CALL login_guest(?);");
+        loginStatement.setString(1, userLogin);
 
-        resultSet = checkAvailableStatement.executeQuery();
+        resultSet = loginStatement.executeQuery();
         resultSet.next();
         String result = resultSet.getString(1);
 
-        if (result.equals("ok")) return true;
+        if (result.equals("ok")) return User.createGuest(userLogin);
         else if (result.equals("login_not_available")) throw new LoginIsNotAvailableException();
-        else return false;
+        else return null;
     }
 
     public String registerUser(UserInfo userInfo, byte[] password) throws SQLException {

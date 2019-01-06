@@ -1,18 +1,19 @@
 package wazxse5.server;
 
+import javafx.collections.ObservableList;
 import wazxse5.common.UserInfo;
 import wazxse5.common.exception.AuthenticationException;
 import wazxse5.common.exception.LoginIsNotAvailableException;
+import wazxse5.common.exception.UserIsAlreadyLoggedException;
 
 import java.sql.SQLException;
-import java.util.List;
 
 public class DataLoader {
     private MysqlConnector mysqlConnector;
-    private List<User> knownUsers;
-    private List<User> guests;
+    private final ObservableList<String> loggedUsersLogins;
 
-    public DataLoader() {
+    public DataLoader(ObservableList<String> loggedUsersLogins) {
+        this.loggedUsersLogins = loggedUsersLogins;
         try {
             mysqlConnector = new MysqlConnector();
             mysqlConnector.connect("localhost", "messenger", "root", "");
@@ -29,20 +30,15 @@ public class DataLoader {
     }
 
     public synchronized User login(String userLogin, byte[] password, boolean isGuest) throws AuthenticationException, SQLException {
+        User user;
         if (isGuest) {
-            boolean result = mysqlConnector.loginGuest(userLogin);
-            if (result) return findUser(userLogin);
+            if (loggedUsersLogins.contains(userLogin)) throw new LoginIsNotAvailableException();
+            user = mysqlConnector.loginGuest(userLogin);
         } else {
-            return mysqlConnector.loginUser(userLogin, password);
+            if (loggedUsersLogins.contains(userLogin)) throw new UserIsAlreadyLoggedException();
+            else user = mysqlConnector.loginUser(userLogin, password);
         }
-        return null;
-    }
-
-    private User findUser(String userLogin) {
-        for (User user : knownUsers) {
-            if (user.getUserInfo().getLogin().equals(userLogin)) return user;
-        }
-        return null;
+        return user;
     }
 
 }

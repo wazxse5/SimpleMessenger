@@ -30,16 +30,16 @@ public class ThreadServer {
 
     private final DataLoader dataLoader;
     private final ObservableList<Connection> connectedConnections;
-    private final ObservableList<String> loggedUsersNames;
+    private final ObservableList<String> loggedUsersLogins;
     private final List<UserMessage> sentUserMessages;
 
     public ThreadServer() {
         this.executor = Executors.newCachedThreadPool();
         this.receiveTasks = new ArrayList<>();
         this.messageSender = new MessageSender();
-        this.dataLoader = new DataLoader();
         this.connectedConnections = FXCollections.observableArrayList();
-        this.loggedUsersNames = FXCollections.observableArrayList();
+        this.loggedUsersLogins = FXCollections.observableArrayList();
+        this.dataLoader = new DataLoader(loggedUsersLogins);
         this.sentUserMessages = new ArrayList<>();
     }
 
@@ -52,7 +52,7 @@ public class ThreadServer {
             acceptingTask.valueProperty().addListener((observable, oldValue, newValue) -> handleNewConnection(newValue));
             executor.submit(acceptingTask);
 
-            UpdatingConnectedTask updatingConnectedTask = new UpdatingConnectedTask(connectedConnections, loggedUsersNames);
+            UpdatingConnectedTask updatingConnectedTask = new UpdatingConnectedTask(connectedConnections, loggedUsersLogins);
             this.updatingConnectedTask = executor.submit(updatingConnectedTask);
         } catch (IOException e) {
             e.printStackTrace();
@@ -80,17 +80,17 @@ public class ThreadServer {
         if (message instanceof LoginRequestMessage) {
             LoginRequestMessage loginRequestMessage = (LoginRequestMessage) message;
             LoginTask loginTask = new LoginTask(dataLoader, connection, loginRequestMessage);
-            loginTask.messageProperty().addListener((observable, oldValue, newValue) -> loggedUsersNames.add(newValue));
+            loginTask.messageProperty().addListener((observable, oldValue, newValue) -> loggedUsersLogins.add(newValue));
             executor.submit(loginTask);
         }
         if (message instanceof GoodbyeMessage) {
             GoodbyeMessage goodbyeMessage = (GoodbyeMessage) message;
             if (goodbyeMessage.getMessage().equals("logout")) {
-                loggedUsersNames.remove(connection.getUser().getLogin());
+                loggedUsersLogins.remove(connection.getUser().getLogin());
                 connection.setUser(User.createEmptyUser());
                 connection.setLogged(false);
             } else {
-                loggedUsersNames.remove(connection.getUser().getLogin());
+                loggedUsersLogins.remove(connection.getUser().getLogin());
                 connectedConnections.remove(connection);
             }
         }

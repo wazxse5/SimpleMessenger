@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import wazxse5.client.controller.*;
+import wazxse5.common.UserInfo;
 import wazxse5.common.exception.*;
 import wazxse5.common.message.UserMessage;
 import wazxse5.common.message.config.GoodbyeMessage;
@@ -80,7 +81,7 @@ public class ViewManager {
     }
 
 
-    public void loadMainScene(String stageTitle) {
+    public void loadMainScene(UserInfo userInfo) {
         if (mainScene == null) {
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main.fxml"));
@@ -94,7 +95,8 @@ public class ViewManager {
             }
         }
         stage.setScene(mainScene);
-        stage.setTitle(stageTitle);
+        if (userInfo.isGuest()) stage.setTitle(userInfo.getLogin() + " - gość");
+        else stage.setTitle(userInfo.getSimpleInfo());
     }
 
     public void handleLoginError(Throwable throwable) {
@@ -103,6 +105,8 @@ public class ViewManager {
         else if (throwable instanceof LoginNotExistsException)
             loginController.setInfoText("Nie ma takiego użytkownika");
         else if (throwable instanceof WrongPasswordException) loginController.setInfoText("Nieprawidłowe hasło");
+        else if (throwable instanceof UserIsAlreadyLoggedException)
+            loginController.setInfoText("Użytkownik jest już zalogowany");
         else loginController.setInfoText("Nie można nawiązać połączenia");
     }
 

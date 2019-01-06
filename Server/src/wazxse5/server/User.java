@@ -25,6 +25,7 @@ public class User {
 
     public User(UserInfo userInfo) {
         id.setValue(Integer.toString(userInfo.getId()));
+        if (userInfo.getId() == -1) id.setValue("G");
         name.setValue(userInfo.getName());
         surname.setValue(userInfo.getSurname());
         login.setValue(userInfo.getLogin());
@@ -39,6 +40,10 @@ public class User {
 
     public static User createEmptyUser() {
         return new User();
+    }
+
+    public static User createGuest(String login) {
+        return new User(new UserInfo(login, true));
     }
 
     public void send(Message message) {

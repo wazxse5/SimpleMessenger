@@ -67,7 +67,7 @@ public class ThreadClient {
             LoginAnswerMessage loginAnswerMessage = (LoginAnswerMessage) message;
             if (loginAnswerMessage.isGood()) {
                 connection.setUserInfo(loginAnswerMessage.getUserInfo());
-                viewManager.loadMainScene(loginAnswerMessage.getUserInfo().getSimpleInfo());
+                viewManager.loadMainScene(loginAnswerMessage.getUserInfo());
             } else viewManager.handleLoginError(loginAnswerMessage.getException());
         }
         if (message instanceof RegisterAnswerMessage) {

@@ -25,6 +25,13 @@ public class UserInfo implements Serializable {
         this.guest = guest;
     }
 
+    public UserInfo(String login, boolean guest) {
+        this.id = -1;
+        this.login = login;
+        this.registrationTime = LocalDateTime.now();
+        this.guest = true;
+    }
+
     public int getId() {
         return id;
     }
