@@ -115,7 +115,7 @@ public class ThreadClient {
 
     public void close() {
         if (messageSender != null) messageSender.finish(); // TODO: Zapisanie niedostarczonych wiadomości do pliku
-//        if (connection != null) connection.send(new GoodbyeMessage("exit"));
+        if (connection != null) connection.send(new GoodbyeMessage("exit"));
         if (executor != null) executor.shutdown();
         if (receiveTask != null) receiveTask.cancel(true);
         if (connection != null) connection.close();

@@ -14,13 +14,16 @@
         <TableView fx:id="connectionsTable" layoutX="21.0" layoutY="47.0" prefHeight="200.0" prefWidth="200.0"
                    AnchorPane.bottomAnchor="90.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0"
                    AnchorPane.topAnchor="40.0">
+            <placeholder>
+                <Label text="Brak połączonych użytkowników"/>
+            </placeholder>
             <columns>
-                <TableColumn fx:id="IDpColumn" minWidth="40.0" prefWidth="100.0" text="ID połączenia"/>
-                <TableColumn fx:id="IDuColumn" minWidth="40.0" prefWidth="100.0" text="ID użytkownika"/>
-                <TableColumn fx:id="loginColumn" minWidth="40.0" prefWidth="100.0" text="Login"/>
+                <TableColumn fx:id="IDpColumn" minWidth="25.0" prefWidth="40.0" text="IDp"/>
+                <TableColumn fx:id="IDuColumn" minWidth="25.0" prefWidth="40.0" text="IDu"/>
                 <TableColumn fx:id="nameColumn" minWidth="40.0" prefWidth="100.0" text="Imię"/>
-                <TableColumn fx:id="surnameColumn" minWidth="40.0" prefWidth="100.0" text="Nazwisko"/>
-                <TableColumn fx:id="mailColumn" minWidth="40.0" prefWidth="100.0" text="mail"/>
+                <TableColumn fx:id="surnameColumn" minWidth="40.0" prefWidth="150.0" text="Nazwisko"/>
+                <TableColumn fx:id="loginColumn" minWidth="40.0" prefWidth="100.0" text="Login"/>
+                <TableColumn fx:id="mailColumn" minWidth="40.0" prefWidth="150.0" text="Mail"/>
             </columns>
         </TableView>
         <HBox layoutX="190.0" layoutY="40.0" spacing="10.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="10.0">
@@ -55,7 +58,7 @@
         <HBox alignment="CENTER_LEFT" prefHeight="30.0" spacing="10.0" AnchorPane.bottomAnchor="10.0"
               AnchorPane.leftAnchor="10.0">
             <children>
-                <Button fx:id="exit" mnemonicParsing="false" prefHeight="30.0" text="Wyjście">
+                <Button fx:id="exit" mnemonicParsing="false" onAction="#exit" prefHeight="30.0" text="Wyjście">
                     <font>
                         <Font size="14.0"/>
                     </font>

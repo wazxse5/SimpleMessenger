@@ -38,7 +38,7 @@ public class ViewManager {
     public void loadInitScene() {
         if (initScene == null) {
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/init.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/init.fxml"));
                 initScene = new Scene(loader.load());
                 initController = loader.getController();
                 initController.setThreadClient(threadClient);
@@ -54,9 +54,9 @@ public class ViewManager {
 
     private void loadLoginRegisterResetNodes() {
         try {
-            FXMLLoader loaderLogin = new FXMLLoader(getClass().getResource("/login.fxml"));
-            FXMLLoader loaderRegister = new FXMLLoader(getClass().getResource("/register.fxml"));
-            FXMLLoader loaderResetPassword = new FXMLLoader(getClass().getResource("/resetPassword.fxml"));
+            FXMLLoader loaderLogin = new FXMLLoader(getClass().getResource("/fxml/login.fxml"));
+            FXMLLoader loaderRegister = new FXMLLoader(getClass().getResource("/fxml/register.fxml"));
+            FXMLLoader loaderResetPassword = new FXMLLoader(getClass().getResource("/fxml/resetPassword.fxml"));
 
             loginNode = loaderLogin.load();
             registerNode = loaderRegister.load();
@@ -83,8 +83,9 @@ public class ViewManager {
     public void loadMainScene(String stageTitle) {
         if (mainScene == null) {
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/main.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main.fxml"));
                 mainScene = new Scene(loader.load());
+                mainScene.getStylesheets().add(String.valueOf(getClass().getResource("/css/main.css")));
                 mainController = loader.getController();
                 mainController.setThreadClient(threadClient);
                 mainController.setViewManager(this);

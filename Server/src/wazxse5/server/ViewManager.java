@@ -26,7 +26,7 @@ public class ViewManager {
     public void loadInitScene() {
         if (initScene == null) {
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/init.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/init.fxml"));
                 initScene = new Scene(loader.load());
                 initController = loader.getController();
                 initController.setThreadServer(threadServer);
@@ -42,7 +42,7 @@ public class ViewManager {
     public void loadMainScene() {
         if (mainScene == null) {
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/main.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main.fxml"));
                 mainScene = new Scene(loader.load());
                 mainController = loader.getController();
                 mainController.setThreadServer(threadServer);
