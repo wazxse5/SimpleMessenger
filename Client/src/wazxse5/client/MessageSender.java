@@ -12,8 +12,10 @@ public class MessageSender {
     private Connection connection;
     private List<Message> messagesToSend;
     private ExecutorService executor;
+    private boolean paused;
 
     public MessageSender() {
+        this.paused = false;
         this.messagesToSend = new ArrayList<>();
         this.executor = Executors.newSingleThreadExecutor();
         executor.execute(new SendingTask());
@@ -31,6 +33,14 @@ public class MessageSender {
         }
     }
 
+    public void pause() {
+        paused = true;
+    }
+
+    public void start() {
+        paused = false;
+    }
+
     public List<Message> finish() {
         executor.shutdownNow();
         return new ArrayList<>(messagesToSend);
@@ -43,8 +53,10 @@ public class MessageSender {
     private class SendingTask implements Runnable {
         @Override public void run() {
             try {
-                for (Message message : messagesToSend) {
-                    connection.send(message);
+                if (!paused) {
+                    for (Message message : messagesToSend) {
+                        connection.send(message);
+                    }
                 }
                 Thread.sleep(500);
             } catch (InterruptedException ignored) {

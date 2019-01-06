@@ -51,7 +51,7 @@ public class ViewManager {
                 System.err.println("Nie można wczytać main.fxml");
             }
         }
-        stage.setTitle("Serwer działa");
+        stage.setTitle("Serwer działa - port: " + threadServer.getServerPort());
         stage.setResizable(true);
         stage.setScene(mainScene);
     }

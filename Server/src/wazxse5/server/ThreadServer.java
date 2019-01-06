@@ -20,6 +20,7 @@ import java.util.concurrent.Future;
 
 public class ThreadServer {
     private ViewManager viewManager;
+    private int serverPort;
 
     private final ExecutorService executor;
     private AcceptingTask acceptingTask;
@@ -45,6 +46,7 @@ public class ThreadServer {
     public void start(int port) {
         try {
             ServerSocket serverSocket = new ServerSocket(port);
+            this.serverPort = port;
 
             acceptingTask = new AcceptingTask(serverSocket, dataLoader);
             acceptingTask.valueProperty().addListener((observable, oldValue, newValue) -> handleNewConnection(newValue));
@@ -100,6 +102,10 @@ public class ThreadServer {
 
     public void setViewManager(ViewManager viewManager) {
         this.viewManager = viewManager;
+    }
+
+    public int getServerPort() {
+        return serverPort;
     }
 
     public void close() {

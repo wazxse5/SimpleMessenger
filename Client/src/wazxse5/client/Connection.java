@@ -2,6 +2,7 @@ package wazxse5.client;
 
 import wazxse5.common.UserInfo;
 import wazxse5.common.message.Message;
+import wazxse5.common.message.config.GoodbyeMessage;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -29,6 +30,7 @@ public class Connection {
 
     public void close() {
         try {
+            send(new GoodbyeMessage("exit"));
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();

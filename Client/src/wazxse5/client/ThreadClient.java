@@ -7,7 +7,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Worker;
 import wazxse5.client.task.ConnectTask;
 import wazxse5.client.task.ReceiveTask;
 import wazxse5.common.UserInfo;
@@ -42,16 +41,16 @@ public class ThreadClient {
 
     public void connect(String address, int port) {
         ConnectTask connectTask = new ConnectTask(address, port);
-        connectTask.setOnSucceeded(event -> handleConnectionSucceed(event.getSource()));
+        connectTask.setOnSucceeded(event -> handleConnectionSucceed(event.getSource().getValue()));
         connectTask.setOnFailed(event -> viewManager.handleConnectError(event.getSource().getException()));
         executor.execute(connectTask);
     }
 
-    private void handleConnectionSucceed(Worker workerConnectTask) {
-        Object objectConnection = workerConnectTask.getValue();
+    private void handleConnectionSucceed(Object objectConnection) {
         if (objectConnection != null) {
             connection = (Connection) objectConnection;
             messageSender.setConnection(connection);
+            messageSender.start();
             connected.setValue(true);
             receiveTask = new ReceiveTask(connection.getInput(), messageSender);
             receiveTask.valueProperty().addListener((observable, oldValue, newValue) -> handleReceivedMessage(newValue));
@@ -73,8 +72,7 @@ public class ThreadClient {
         }
         if (message instanceof RegisterAnswerMessage) {
             RegisterAnswerMessage registerAnswerMessage = (RegisterAnswerMessage) message;
-            if (registerAnswerMessage.isGood()) viewManager.getInitController().setInfoText("R", "Zarejestrowano");
-            else viewManager.handleRegisterError(registerAnswerMessage.getException());
+            viewManager.handleRegisterError(registerAnswerMessage.getException());
         }
         if (message instanceof GoodbyeMessage) {
             GoodbyeMessage goodbyeMessage = (GoodbyeMessage) message;
@@ -107,9 +105,17 @@ public class ThreadClient {
         viewManager.loadInitScene();
     }
 
+    public void disconnect() {
+        messageSender.pause();
+        receiveTask.cancel(true);
+        connection.close();
+        connection = null;
+        connected.setValue(false);
+    }
+
     public void close() {
         if (messageSender != null) messageSender.finish(); // TODO: Zapisanie niedostarczonych wiadomości do pliku
-        if (connection != null) connection.send(new GoodbyeMessage("exit"));
+//        if (connection != null) connection.send(new GoodbyeMessage("exit"));
         if (executor != null) executor.shutdown();
         if (receiveTask != null) receiveTask.cancel(true);
         if (connection != null) connection.close();

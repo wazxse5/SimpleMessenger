@@ -1,11 +1,11 @@
 package wazxse5.client;
 
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
-import wazxse5.client.controller.InitController;
-import wazxse5.client.controller.MainController;
+import wazxse5.client.controller.*;
 import wazxse5.common.exception.*;
 import wazxse5.common.message.UserMessage;
 import wazxse5.common.message.config.GoodbyeMessage;
@@ -18,8 +18,14 @@ public class ViewManager {
 
     private Scene mainScene;
     private Scene initScene;
+    private Node loginNode;
+    private Node registerNode;
+    private Node resetPasswordNode;
     private MainController mainController;
     private InitController initController;
+    private LoginController loginController;
+    private RegisterController registerController;
+    private ResetPasswordController resetPasswordController;
 
     public ViewManager(Stage stage, ThreadClient threadClient) {
         this.stage = stage;
@@ -41,9 +47,38 @@ public class ViewManager {
                 System.err.println("Nie można wczytać init.fxml");
             }
         }
+        loadLoginRegisterResetNodes();
         stage.setScene(initScene);
         stage.setTitle("Simple Messenger by wazxse5");
     }
+
+    private void loadLoginRegisterResetNodes() {
+        try {
+            FXMLLoader loaderLogin = new FXMLLoader(getClass().getResource("/login.fxml"));
+            FXMLLoader loaderRegister = new FXMLLoader(getClass().getResource("/register.fxml"));
+            FXMLLoader loaderResetPassword = new FXMLLoader(getClass().getResource("/resetPassword.fxml"));
+
+            loginNode = loaderLogin.load();
+            registerNode = loaderRegister.load();
+            resetPasswordNode = loaderResetPassword.load();
+
+            loginController = loaderLogin.getController();
+            registerController = loaderRegister.getController();
+            resetPasswordController = loaderResetPassword.getController();
+            loginController.setThreadClient(threadClient);
+            registerController.setThreadClient(threadClient);
+            resetPasswordController.setThreadClient(threadClient);
+            loginController.setViewManager(this);
+            registerController.setViewManager(this);
+            resetPasswordController.setViewManager(this);
+        } catch (IOException e) {
+            System.err.println("Nie można wczytać login/register/reset.fxml");
+        }
+        initController.getLoginTab().setContent(loginNode);
+        initController.getRegisterTab().setContent(registerNode);
+        initController.getResetPasswordTab().setContent(resetPasswordNode);
+    }
+
 
     public void loadMainScene(String stageTitle) {
         if (mainScene == null) {
@@ -63,21 +98,22 @@ public class ViewManager {
 
     public void handleLoginError(Throwable throwable) {
         if (throwable instanceof LoginIsNotAvailableException)
-            initController.setInfoText("L", "Ten login jest zajęty");
+            loginController.setInfoText("Ten login jest zajęty");
         else if (throwable instanceof LoginNotExistsException)
-            initController.setInfoText("L", "Nie ma takiego użytkownika");
-        else if (throwable instanceof WrongPasswordException) initController.setInfoText("L", "Nieprawidłowe hasło");
-        else initController.setInfoText("L", "Nie można nawiązać połączenia");
+            loginController.setInfoText("Nie ma takiego użytkownika");
+        else if (throwable instanceof WrongPasswordException) loginController.setInfoText("Nieprawidłowe hasło");
+        else loginController.setInfoText("Nie można nawiązać połączenia");
     }
 
     public void handleConnectError(Throwable throwable) {
         if (throwable instanceof DatabaseException)
-            initController.setInfoText("C", "Nie można nawiązać połączenia");
+            initController.setInfoText("Nie można nawiązać połączenia");
     }
 
     public void handleRegisterError(Throwable throwable) {
-        if (throwable instanceof NoConnectionException) initController.setInfoText("R", "Nie połączono");
-        else if (throwable instanceof DatabaseException) initController.setInfoText("R", "Błąd bazy danych");
+        if (throwable == null) registerController.setInfoText("Zarejestrowano");
+        else if (throwable instanceof NoConnectionException) registerController.setInfoText("Nie połączono");
+        else if (throwable instanceof DatabaseException) registerController.setInfoText("Błąd bazy danych");
     }
 
     public void handleReceivedUserMessage(UserMessage userMessage) {
