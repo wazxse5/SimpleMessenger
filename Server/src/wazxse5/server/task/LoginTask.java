@@ -23,7 +23,7 @@ public class LoginTask extends Task<Void> {
 
     @Override protected Void call() {
         String name = loginRequestMessage.getLogin();
-        byte[] password = loginRequestMessage.getPassword();
+        String password = loginRequestMessage.getPassword();
         boolean isGuest = loginRequestMessage.isGuest();
         try {
             User user = dataLoader.login(name, password, isGuest);

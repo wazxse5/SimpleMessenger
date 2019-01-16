@@ -3,10 +3,10 @@ package wazxse5.common.message.config;
 public class LoginRequestMessage extends ServerMessage {
     private static final long serialVersionUID = -8511670995169064933L;
     private final String login;
-    private final byte[] password;
+    private final String password;
     private final boolean guest;
 
-    public LoginRequestMessage(String login, byte[] password, boolean guest) {
+    public LoginRequestMessage(String login, String password, boolean guest) {
         this.login = login;
         this.password = password;
         this.guest = guest;
@@ -16,7 +16,7 @@ public class LoginRequestMessage extends ServerMessage {
         return login;
     }
 
-    public byte[] getPassword() {
+    public String getPassword() {
         return password;
     }
 

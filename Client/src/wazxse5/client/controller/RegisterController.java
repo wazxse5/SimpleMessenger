@@ -9,10 +9,6 @@ import wazxse5.client.ThreadClient;
 import wazxse5.client.ViewManager;
 import wazxse5.common.UserInfo;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
 public class RegisterController {
     private ViewManager viewManager;
     private ThreadClient threadClient;
@@ -32,22 +28,12 @@ public class RegisterController {
         String mail = mailTF.getText();
         String login = loginTF.getText();
         if (passwordPF.getText().trim().equals(passwordPF1.getText().trim())) {
-            byte[] password = hash(passwordPF.getText());
+            String password = passwordPF.getText();
             if (password != null) {
                 UserInfo userInfo = new UserInfo(-1, name, surname, mail, login, null, -1, false);
                 threadClient.sendRegisterRequest(userInfo, password);
             }
         } else infoL.setText("Wpisane hasła różnią się");
-    }
-
-    private byte[] hash(String text) {
-        try {
-            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-            byte[] bytes = text.trim().getBytes(StandardCharsets.UTF_8);
-            return messageDigest.digest(bytes);
-        } catch (NoSuchAlgorithmException e) {
-            return null;
-        }
     }
 
     public void setInfoText(String text) {

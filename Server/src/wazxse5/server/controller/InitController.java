@@ -6,17 +6,25 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import wazxse5.server.MysqlConnector;
 import wazxse5.server.ThreadServer;
 import wazxse5.server.ViewManager;
+
+import java.sql.SQLException;
 
 public class InitController {
     private ThreadServer threadServer;
     private ViewManager viewManager;
+    private MysqlConnector mysqlConnector;
 
     private IntegerProperty serverPort = new SimpleIntegerProperty();
     @FXML private Button startServerButton;
     @FXML private TextField serverPortTF;
     @FXML private Label infoLabel;
+    @FXML private TextField dbAddressTF;
+    @FXML private TextField dbNameTF;
+    @FXML private TextField dbUserTF;
+    @FXML private TextField dbPasswordTF;
 
     public void initialize() {
         serverPortTF.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -34,8 +42,21 @@ public class InitController {
     }
 
     public void startServer() {
-        threadServer.start(Integer.parseInt(serverPortTF.getText()));
-        viewManager.loadMainScene();
+        try {
+            connectToDatabase(dbNameTF.getText());
+            threadServer.getDataLoader().setMysqlConnector(mysqlConnector);
+            threadServer.start(Integer.parseInt(serverPortTF.getText()));
+            viewManager.loadMainScene();
+        } catch (ClassNotFoundException e) {
+            infoLabel.setText("Nie można wczytać connectora bazy danych");
+        } catch (SQLException e) {
+            infoLabel.setText("Nie można połączyć się z bazą danych");
+        }
+    }
+
+    private void connectToDatabase(String dbName) throws ClassNotFoundException, SQLException {
+        mysqlConnector = new MysqlConnector();
+        mysqlConnector.connect(dbAddressTF.getText(), dbName, dbUserTF.getText(), dbPasswordTF.getText());
     }
 
     public void setThreadServer(ThreadServer threadServer) {

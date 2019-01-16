@@ -10,24 +10,27 @@ import java.time.ZoneId;
 
 public class MysqlConnector {
     private Connection connection;
-    private ResultSet resultSet;
+    private PreparedStatement lgUsSt;
+    private PreparedStatement lgGuSt;
+    private PreparedStatement rgUsSt;
 
     public MysqlConnector() throws ClassNotFoundException {
         String driver = "com.mysql.cj.jdbc.Driver";
         Class.forName(driver);
     }
 
-    public void connect(String address, String dbName, String dbUserName, String dbPassword) throws SQLException {
-        String dbUrl = "jdbc:mysql://" + address + "/" + dbName + "?characterEncoding=utf8";
+    public void connect(String dbAddress, String dbName, String dbUserName, String dbPassword) throws SQLException {
+        String dbUrl = "jdbc:mysql://" + dbAddress + "/" + dbName + "?characterEncoding=utf8";
         connection = DriverManager.getConnection(dbUrl, dbUserName, dbPassword);
+        lgUsSt = connection.prepareStatement("CALL login_user(?,?);");
+        lgGuSt = connection.prepareStatement("CALL login_guest(?);");
+        rgUsSt = connection.prepareStatement("CALL register_user(?, ? ,?, ?, ?);");
     }
 
-    public User loginUser(String userLogin, byte[] password) throws SQLException, AuthenticationException {
-        PreparedStatement loginStatement = connection.prepareStatement("CALL login_user(?,?);");
-        loginStatement.setString(1, userLogin);
-        loginStatement.setBytes(2, password);
-
-        resultSet = loginStatement.executeQuery();
+    public synchronized User loginUser(String userLogin, String password) throws SQLException, AuthenticationException {
+        lgUsSt.setString(1, userLogin);
+        lgUsSt.setString(2, password);
+        ResultSet resultSet = lgUsSt.executeQuery();
         resultSet.next();
         String result = resultSet.getString(1);
 
@@ -45,11 +48,9 @@ public class MysqlConnector {
         return null;
     }
 
-    public User loginGuest(String userLogin) throws SQLException, LoginIsNotAvailableException {
-        PreparedStatement loginStatement = connection.prepareStatement("CALL login_guest(?);");
-        loginStatement.setString(1, userLogin);
-
-        resultSet = loginStatement.executeQuery();
+    public synchronized User loginGuest(String userLogin) throws SQLException, LoginIsNotAvailableException {
+        lgGuSt.setString(1, userLogin);
+        ResultSet resultSet = lgGuSt.executeQuery();
         resultSet.next();
         String result = resultSet.getString(1);
 
@@ -58,14 +59,13 @@ public class MysqlConnector {
         else return null;
     }
 
-    public String registerUser(UserInfo userInfo, byte[] password) throws SQLException {
-        PreparedStatement registerStatement = connection.prepareStatement("CALL create_user(?, ? ,?, ?, ?);");
-        registerStatement.setString(1, userInfo.getLogin());
-        registerStatement.setBytes(2, password);
-        registerStatement.setString(3, userInfo.getMail());
-        registerStatement.setString(4, userInfo.getName());
-        registerStatement.setString(5, userInfo.getSurname());
-        resultSet = registerStatement.executeQuery();
+    public synchronized String registerUser(UserInfo userInfo, String password) throws SQLException {
+        rgUsSt.setString(1, userInfo.getLogin());
+        rgUsSt.setString(2, password);
+        rgUsSt.setString(3, userInfo.getMail());
+        rgUsSt.setString(4, userInfo.getName());
+        rgUsSt.setString(5, userInfo.getSurname());
+        ResultSet resultSet = rgUsSt.executeQuery();
         resultSet.next();
         return resultSet.getString("result");
     }

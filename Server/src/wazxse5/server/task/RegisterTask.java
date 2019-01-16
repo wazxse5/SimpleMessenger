@@ -24,7 +24,7 @@ public class RegisterTask extends Task<Void> {
 
     @Override protected Void call() {
         UserInfo userInfo = registerRequestMessage.getUserInfo();
-        byte[] password = registerRequestMessage.getPassword();
+        String password = registerRequestMessage.getPassword();
         try {
             if (dataLoader.register(userInfo, password)) connection.send(new RegisterAnswerMessage(true, null));
             else throw new SQLException();

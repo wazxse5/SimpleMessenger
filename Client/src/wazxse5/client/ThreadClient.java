@@ -84,13 +84,13 @@ public class ThreadClient {
         }
     }
 
-    public void sendLoginRequest(String login, byte[] password, boolean guest) {
+    public void sendLoginRequest(String login, String password, boolean guest) {
         if (connection != null) {
             connection.send(new LoginRequestMessage(login, password, guest));
         } else viewManager.handleLoginError(new DatabaseException());
     }
 
-    public void sendRegisterRequest(UserInfo userInfo, byte[] password) {
+    public void sendRegisterRequest(UserInfo userInfo, String password) {
         if (connection != null) {
             connection.send(new RegisterRequestMessage(userInfo, password));
         } else viewManager.handleRegisterError(new NoConnectionException());

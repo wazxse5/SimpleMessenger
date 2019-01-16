@@ -108,6 +108,10 @@ public class ThreadServer {
         return serverPort;
     }
 
+    public DataLoader getDataLoader() {
+        return dataLoader;
+    }
+
     public void close() {
         if (messageSender != null) messageSender.finish();
         if (executor != null) executor.shutdown();

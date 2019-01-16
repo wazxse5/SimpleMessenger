@@ -14,22 +14,16 @@ public class DataLoader {
 
     public DataLoader(ObservableList<String> loggedUsersLogins) {
         this.loggedUsersLogins = loggedUsersLogins;
-        try {
-            mysqlConnector = new MysqlConnector();
-            mysqlConnector.connect("localhost", "messenger", "root", "");
-        } catch (SQLException | ClassNotFoundException e) {
-            System.err.println("Nie można połączyć się z bazą danych");
-        }
     }
 
-    public synchronized boolean register(UserInfo userInfo, byte[] password) throws SQLException, LoginIsNotAvailableException {
+    public synchronized boolean register(UserInfo userInfo, String password) throws SQLException, LoginIsNotAvailableException {
         String result = mysqlConnector.registerUser(userInfo, password);
         if (result.equals("ok")) return true;
         else if (result.equals("login_not_available")) throw new LoginIsNotAvailableException();
         else return false;
     }
 
-    public synchronized User login(String userLogin, byte[] password, boolean isGuest) throws AuthenticationException, SQLException {
+    public synchronized User login(String userLogin, String password, boolean isGuest) throws AuthenticationException, SQLException {
         User user;
         if (isGuest) {
             if (loggedUsersLogins.contains(userLogin)) throw new LoginIsNotAvailableException();
@@ -41,4 +35,7 @@ public class DataLoader {
         return user;
     }
 
+    public void setMysqlConnector(MysqlConnector mysqlConnector) {
+        this.mysqlConnector = mysqlConnector;
+    }
 }

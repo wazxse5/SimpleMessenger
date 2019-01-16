@@ -8,10 +8,6 @@ import javafx.scene.control.TextField;
 import wazxse5.client.ThreadClient;
 import wazxse5.client.ViewManager;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
 public class LoginController {
     private ViewManager viewManager;
     private ThreadClient threadClient;
@@ -33,18 +29,8 @@ public class LoginController {
 
     private void login(boolean guest) {
         String login = loginTF.getText();
-        byte[] password = hash(passwordTF.getText());
+        String password = passwordTF.getText();
         threadClient.sendLoginRequest(login, password, guest);
-    }
-
-    private byte[] hash(String text) {
-        try {
-            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-            byte[] bytes = text.trim().getBytes(StandardCharsets.UTF_8);
-            return messageDigest.digest(bytes);
-        } catch (NoSuchAlgorithmException e) {
-            return null;
-        }
     }
 
     public void setInfoText(String text) {
