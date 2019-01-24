@@ -24,9 +24,10 @@ import java.util.concurrent.Executors;
 public class ThreadClient {
     private ViewManager viewManager;
     private Connection connection;
+    private MessageSender messageSender;
+
     private ExecutorService executor;
     private ReceiveTask receiveTask;
-    private MessageSender messageSender;
 
     private BooleanProperty connected = new SimpleBooleanProperty();
     private ListProperty<String> connectedFriendsProperty = new SimpleListProperty<>();

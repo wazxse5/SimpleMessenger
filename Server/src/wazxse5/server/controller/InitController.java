@@ -10,6 +10,7 @@ import wazxse5.server.MysqlConnector;
 import wazxse5.server.ThreadServer;
 import wazxse5.server.ViewManager;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
 public class InitController {
@@ -51,6 +52,20 @@ public class InitController {
             infoLabel.setText("Nie można wczytać connectora bazy danych");
         } catch (SQLException e) {
             infoLabel.setText("Nie można połączyć się z bazą danych");
+        }
+    }
+
+    public void createDataBase() {
+        try {
+            mysqlConnector = new MysqlConnector();
+            mysqlConnector.create(dbAddressTF.getText(), dbNameTF.getText(), dbUserTF.getText(), dbPasswordTF.getText());
+            infoLabel.setText("Baza danych została utworzona");
+        } catch (ClassNotFoundException e) {
+            infoLabel.setText("Nie można wczytać connectora bazy danych");
+        } catch (SQLException e) {
+            infoLabel.setText("Nie można połączyć się z bazą danych");
+        } catch (IOException e) {
+            infoLabel.setText("Nie można wczytać pliku bazy danych");
         }
     }
 
